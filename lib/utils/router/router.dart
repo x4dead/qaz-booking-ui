@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
 import 'package:qaz_booking_ui/ui/pages/splash_screen/splah_screen.dart';
 import 'package:qaz_booking_ui/utils/router/fade_transition.dart';
 
@@ -43,13 +45,12 @@ class AppRouter {
                 child: const SplashScreen(), key: state.pageKey);
           },
         ),
-        // GoRoute(
-        //   path: '/chat',
-        //   pageBuilder: (context, state) {
-        //     return FadeTransitionPage(
-        //         child: const ChatPage(), key: state.pageKey);
-        //   },
-        // ),
+        GoRoute(
+          path: '/main',
+          pageBuilder: (context, state) {
+            return CupertinoPage(child: const MainPage(), key: state.pageKey);
+          },
+        ),
         // GoRoute(
         //   path: '/create_chat',
         //   pageBuilder: (context, state) {

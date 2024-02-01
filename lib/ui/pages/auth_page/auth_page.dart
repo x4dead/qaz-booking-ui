@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_button.dart';
 import 'package:qaz_booking_ui/ui/widgets/floating_label_text_field.dart';
@@ -18,6 +19,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.colorWhite,
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 100),
         child: CustomAppBar(leading: (
@@ -51,9 +53,12 @@ class _AuthPageState extends State<AuthPage> {
               ],
             ),
             const Spacer(),
-            const Padding(
+            Padding(
               padding: kPH20,
-              child: CustomButton(buttonText: 'Далее'),
+              child: CustomButton(
+                buttonText: 'Далее',
+                onTap: () => context.go('/main'),
+              ),
             ),
             kSBH100,
           ],
