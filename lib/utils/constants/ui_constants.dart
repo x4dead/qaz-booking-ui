@@ -7,6 +7,8 @@ const kSBH25 = SizedBox(height: 25);
 const kSBH100 = SizedBox(height: 100);
 const kSBH45 = SizedBox(height: 45);
 const kSBH10 = SizedBox(height: 10);
+const kSBW6 = SizedBox(width: 6);
+const kSBH6 = SizedBox(height: 6);
 const kNothing = SizedBox.shrink();
 
 ///Padding

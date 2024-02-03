@@ -12,8 +12,8 @@ class GuestModel {
   final String? guestFullname;
   final String? phoneNumber;
   final String? paymentMethod;
-  final int? prepayment;
-  final int? payment;
+  final String? prepayment;
+  final String? payment;
   final List<String>? photosOfDocuments;
   final String? color;
   final String? comment;
@@ -49,8 +49,8 @@ class GuestModel {
     String? guestFullname,
     String? phoneNumber,
     String? paymentMethod,
-    int? prepayment,
-    int? payment,
+    String? prepayment,
+    String? payment,
     List<String>? photosOfDocuments,
     String? color,
     String? comment,

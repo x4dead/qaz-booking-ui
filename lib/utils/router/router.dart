@@ -23,9 +23,9 @@ class AppRouter {
           path: '/',
           redirect: (_, __) {
             // if (UserPref.getUserUid != '') {
-            //   return '/main';
+            return '/main';
             // } else {
-            return '/splash';
+            // return '/splash';
             // }
           },
         ),

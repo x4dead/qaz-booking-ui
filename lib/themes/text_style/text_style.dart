@@ -4,6 +4,16 @@ import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 abstract class AppTextStyle {
   static const TextStyle w500s18 =
       TextStyle(fontSize: 18, fontWeight: FontWeight.w500);
+  static const TextStyle w600s9 = TextStyle(
+    fontSize: 9,
+    fontWeight: FontWeight.w600,
+  );
+// Font: Gilroy
+// Font weight: 600
+// Font size: 9pxpx
+// Row height: 11px
+// Letter spacing: 0px
+// Align: Align center
 
 // color: var(--Primary-Black, #1B1D24);
 // text-align: center;

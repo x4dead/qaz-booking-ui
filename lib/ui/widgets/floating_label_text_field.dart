@@ -28,6 +28,7 @@ class FloatingLabelTextField extends StatefulWidget {
     this.focusedColor,
     this.hintStyle,
     this.textAlign,
+    this.floatingLabelBgColor = AppColors.colorWhite,
   });
 
   final TextEditingController controller;
@@ -51,6 +52,7 @@ class FloatingLabelTextField extends StatefulWidget {
   final FocusNode? myFocusNode;
   final Color? focusedColor;
   final TextAlign? textAlign;
+  final Color? floatingLabelBgColor;
   @override
   State<FloatingLabelTextField> createState() => _FloatingLabelTextFieldState();
 }
@@ -129,7 +131,7 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   height: 17,
-                  color: AppColors.colorWhite,
+                  color: widget.floatingLabelBgColor!,
                   alignment: Alignment.center,
                   child: Text(
                     widget.floatingLabelText,

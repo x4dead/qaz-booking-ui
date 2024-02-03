@@ -8,4 +8,12 @@ abstract class AppImages {
   static const menu = 'assets/svg/menu.svg';
   static const hours = 'assets/svg/hours.svg';
   static const days = 'assets/svg/days.svg';
+  static const bed = 'assets/svg/bed.svg';
+  static const bicycle = 'assets/svg/bicycle.svg';
+  static const bike = 'assets/svg/bike.svg';
+  static const calendar = 'assets/svg/calendar.svg';
+  static const car = 'assets/svg/car.svg';
+  static const cottage = 'assets/svg/cottage.svg';
+  static const doubleBed = 'assets/svg/double_bed.svg';
+  static const save = 'assets/svg/save.svg';
 }
