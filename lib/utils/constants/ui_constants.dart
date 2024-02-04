@@ -11,6 +11,7 @@ const kSBH45 = SizedBox(height: 45);
 const kSBH10 = SizedBox(height: 10);
 const kSBW10 = SizedBox(width: 10);
 const kSBH15 = SizedBox(height: 15);
+const kSBH16 = SizedBox(height: 16);
 const kSBW6 = SizedBox(width: 6);
 const kSBH6 = SizedBox(height: 6);
 const kSBH8 = SizedBox(height: 8);
@@ -21,6 +22,8 @@ const kPH20V12 = EdgeInsets.symmetric(horizontal: 20, vertical: 12);
 const kPZero = EdgeInsets.zero;
 const kPAll6 = EdgeInsets.all(6);
 const kPAll20 = EdgeInsets.all(20);
+const kPV15 = EdgeInsets.symmetric(vertical: 15);
+const kPH45V25 = EdgeInsets.symmetric(horizontal: 45, vertical: 25);
 const kPH20 = EdgeInsets.symmetric(horizontal: 20);
 const kPH20V18Dot5 = EdgeInsets.symmetric(horizontal: 20, vertical: 18.5);
 

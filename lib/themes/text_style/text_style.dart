@@ -11,7 +11,7 @@ abstract class AppTextStyle {
   static TextStyle w600s24 = TextStyle(
       fontSize: 24,
       fontWeight: FontWeight.w600,
-      height: 17.0.toFigmaHeight(24));
+      height: 29.0.toFigmaHeight(24));
 // Font: Gilroy
 // Font weight: 600
 // Font size: 9pxpx

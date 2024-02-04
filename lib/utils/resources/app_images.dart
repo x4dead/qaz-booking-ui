@@ -22,4 +22,5 @@ abstract class AppImages {
   static const attachDocument = 'assets/svg/attach_document.svg';
   static const main = 'assets/svg/main.svg';
   static const person = 'assets/svg/person.svg';
+  static const plus = 'assets/svg/plus.svg';
 }

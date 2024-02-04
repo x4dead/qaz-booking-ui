@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
+import 'package:qaz_booking_ui/ui/pages/objects_for_rent_page/objects_for_rent_page.dart';
 import 'package:qaz_booking_ui/ui/pages/splash_screen/splah_screen.dart';
 import 'package:qaz_booking_ui/utils/router/fade_transition.dart';
 
@@ -38,8 +39,6 @@ class AppRouter {
         ),
         GoRoute(
           path: '/splash',
-
-          // builder: (context, state) => const SplashScreen,
           pageBuilder: (context, state) {
             return FadeTransitionPage(
                 child: const SplashScreen(), key: state.pageKey);
@@ -48,16 +47,18 @@ class AppRouter {
         GoRoute(
           path: '/main',
           pageBuilder: (context, state) {
-            return CupertinoPage(child: const MainPage(), key: state.pageKey);
+            return CupertinoPage(
+                child: MainPage(routeState: state), key: state.pageKey);
           },
         ),
-        // GoRoute(
-        //   path: '/create_chat',
-        //   pageBuilder: (context, state) {
-        //     return FadeTransitionPage(
-        //         child: const CreateChatPage(), key: state.pageKey);
-        //   },
-        // ),
+        GoRoute(
+          path: '/objects_for_rent',
+          pageBuilder: (context, state) {
+            return FadeTransitionPage(
+                child: ObjectsForRentPage(routeState: state),
+                key: state.pageKey);
+          },
+        ),
       ],
       errorBuilder: (context, state) =>
           const Scaffold(body: Center(child: Text('Not found route'))));

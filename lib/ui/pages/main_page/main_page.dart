@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/calendar/calendar.dart';
 import 'package:qaz_booking_ui/calendar/src/calendar/appointment_engine/calendar_datasource.dart';
 import 'package:qaz_booking_ui/calendar/src/calendar/settings/header_style.dart';
@@ -47,8 +48,8 @@ class BookingDataSource extends CalendarDataSource {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
+  const MainPage({super.key, this.routeState});
+  final GoRouterState? routeState;
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -80,10 +81,11 @@ class _MainPageState extends State<MainPage> {
       return meetings;
     }
 
+    final globalKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
       key: globalKey,
-      drawer: const DrawerMenu(),
+      drawer: DrawerMenu(routeState: widget.routeState),
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 100),
         child: CustomAppBar(title: 'QazBooking', action: (
