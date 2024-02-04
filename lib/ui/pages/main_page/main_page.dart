@@ -9,6 +9,7 @@ import 'package:qaz_booking_ui/calendar/src/calendar/custom_calendar.dart';
 import 'package:qaz_booking_ui/model/guest_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/widgets/drawer_menu.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
@@ -80,9 +81,9 @@ class _MainPageState extends State<MainPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.colorGreen,
+      backgroundColor: AppColors.colorWhite,
       key: globalKey,
-      drawer: Drawer(),
+      drawer: const DrawerMenu(),
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 100),
         child: CustomAppBar(title: 'QazBooking', action: (
@@ -93,70 +94,70 @@ class _MainPageState extends State<MainPage> {
           () => globalKey.currentState?.openDrawer(),
         )),
       ),
-      body:
-          // Row(
-          //   mainAxisSize: MainAxisSize.min,
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //     Container(
-          //       height: 82,
-          //       width: 89,
-          //       clipBehavior: Clip.hardEdge,
-          //       decoration: const BoxDecoration(
-          //           border: Border(
-          //               bottom: BorderSide(
-          //                   color: AppColors.colorLightGray,
-          //                   style: BorderStyle.solid,
-          //                   strokeAlign: BorderSide.strokeAlignInside))),
-          //       child: Center(
-          //         child: Column(
-          //           mainAxisAlignment: MainAxisAlignment.center,
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             SvgPicture.asset(AppImages.calendar),
-          //             kSBH6,
-          //             Text(
-          //               'Авг. 2023',
-          //               style: AppTextStyle.w500s12
-          //                   .copyWith(color: AppColors.colorDarkGray),
-          //             )
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //     // ],
-          //     // ),
-          //     Expanded(
-          //       child:
-          SfCalendar(
-        // monthViewSettings: MonthViewSettings(
-        //     showAgenda: true,
-        //     appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
-        // showDatePickerButton: true,
-        // showTodayButton: true,
-        // showNavigationArrow: true,
-        // allowViewNavigation: true,
+      // body:
+      // Row(
+      //   mainAxisSize: MainAxisSize.min,
+      //   crossAxisAlignment: CrossAxisAlignment.start,
+      //   children: [
+      //     Container(
+      //       height: 82,
+      //       width: 89,
+      //       clipBehavior: Clip.hardEdge,
+      //       decoration: const BoxDecoration(
+      //           border: Border(
+      //               bottom: BorderSide(
+      //                   color: AppColors.colorLightGray,
+      //                   style: BorderStyle.solid,
+      //                   strokeAlign: BorderSide.strokeAlignInside))),
+      //       child: Center(
+      //         child: Column(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           children: [
+      //             SvgPicture.asset(AppImages.calendar),
+      //             kSBH6,
+      //             Text(
+      //               'Авг. 2023',
+      //               style: AppTextStyle.w500s12
+      //                   .copyWith(color: AppColors.colorDarkGray),
+      //             )
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //     // ],
+      //     // ),
+      //     Expanded(
+      //       child:
+      // SfCalendar(
+      // monthViewSettings: MonthViewSettings(
+      //     showAgenda: true,
+      //     appointmentDisplayMode: MonthAppointmentDisplayMode.appointment),
+      // showDatePickerButton: true,
+      // showTodayButton: true,
+      // showNavigationArrow: true,
+      // allowViewNavigation: true,
 
-        // allowAppointmentResize: true,
+      // allowAppointmentResize: true,
 
-        // headerHeight: 0,
-        // viewHeaderStyle: ViewHeaderStyle(),
-        // loadMoreWidgetBuilder: (context, loadMoreAppointments) =>
-        //     Text('loadMoreWidgetBuilder'),
-        // monthViewSettings: MonthViewSettings(showAgenda: true),
-        // appointmentBuilder: (context, calendarAppointmentDetails) =>
-        //     Text('appointmentBuilder'),
-        // timeRegionBuilder: (context, timeRegionDetails) =>
-        //     Text('timeRegionBuilder'),
-        // resourceViewHeaderBuilder: (context, details) =>
-        //     Text('resourceViewHeaderBuilder'),
-        // monthCellBuilder: (context, details) => Text('monthCellBuilder'),
-        // scheduleViewMonthHeaderBuilder: (context, details) =>
-        //     Text('scheduleViewMonthHeaderBuilder'),
-        // viewHeaderHeight: 82,
-        dataSource: BookingDataSource(_getDataSource()),
-        // view: CalendarView.timelineDay,
-      ),
+      // headerHeight: 0,
+      // viewHeaderStyle: ViewHeaderStyle(),
+      // loadMoreWidgetBuilder: (context, loadMoreAppointments) =>
+      //     Text('loadMoreWidgetBuilder'),
+      // monthViewSettings: MonthViewSettings(showAgenda: true),
+      // appointmentBuilder: (context, calendarAppointmentDetails) =>
+      //     Text('appointmentBuilder'),
+      // timeRegionBuilder: (context, timeRegionDetails) =>
+      //     Text('timeRegionBuilder'),
+      // resourceViewHeaderBuilder: (context, details) =>
+      //     Text('resourceViewHeaderBuilder'),
+      // monthCellBuilder: (context, details) => Text('monthCellBuilder'),
+      // scheduleViewMonthHeaderBuilder: (context, details) =>
+      //     Text('scheduleViewMonthHeaderBuilder'),
+      // viewHeaderHeight: 82,
+      // dataSource: BookingDataSource(_getDataSource()),
+      // view: CalendarView.timelineDay,
+      // ),
       //     ),
       //   ],
       // ),

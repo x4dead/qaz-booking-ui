@@ -8,6 +8,10 @@ abstract class AppTextStyle {
     fontSize: 9,
     fontWeight: FontWeight.w600,
   );
+  static TextStyle w600s24 = TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      height: 17.0.toFigmaHeight(24));
 // Font: Gilroy
 // Font weight: 600
 // Font size: 9pxpx
@@ -77,10 +81,11 @@ abstract class AppTextStyle {
 // font-weight: 500;
 // line-height: normal;
 
-  static const TextStyle w500s18Ellipsis = TextStyle(
+  static TextStyle w500s18Ellipsis = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w500,
-      overflow: TextOverflow.ellipsis);
+      overflow: TextOverflow.ellipsis,
+      height: 13.0.toFigmaHeight(18));
 // overflow: hidden;
 // color: var(--Primary-Black, #1B1D24);
 // leading-trim: both;

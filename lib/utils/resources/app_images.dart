@@ -16,4 +16,10 @@ abstract class AppImages {
   static const cottage = 'assets/svg/cottage.svg';
   static const doubleBed = 'assets/svg/double_bed.svg';
   static const save = 'assets/svg/save.svg';
+  static const archive = 'assets/svg/archive.svg';
+  static const list = 'assets/svg/list.svg';
+  static const home = 'assets/svg/home.svg';
+  static const attachDocument = 'assets/svg/attach_document.svg';
+  static const main = 'assets/svg/main.svg';
+  static const person = 'assets/svg/person.svg';
 }
