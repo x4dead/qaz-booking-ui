@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/cupertino.dart';
+import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 
 abstract class AppTextStyle {
@@ -230,11 +231,13 @@ abstract class AppTextStyle {
 // line-height: normal;
 
   static TextStyle w400s15SFProDisplay = TextStyle(
-      height: 24.0.toFigmaHeight(15),
-      letterSpacing: 0.3,
-      fontSize: 15,
-      fontWeight: FontWeight.w400,
-      fontFamily: 'SF Pro Display');
+    height: 24.0.toFigmaHeight(15),
+    letterSpacing: 0.3,
+    fontSize: 15,
+    fontWeight: FontWeight.w400,
+    color: AppColors.colorDarkGray,
+    fontFamily: 'SF Pro Display',
+  );
 // color: var(--Gradations-gray-Dark-Gray, #375165);
 // text-align: center;
 // font-family: "SF Pro Display";

@@ -90,7 +90,7 @@ class DrawerMenu extends StatelessWidget {
                               ///
                               ///TODO: Сделать правильную анимацию перехода в профиль через Drawer меню
                             },
-                          1 => {goToPage('objects_for_rent')},
+                          1 => {goToPage('objects_for_booking')},
                           2 => {goToPage('objects_for_rent')},
                           3 => {goToPage('objects_for_rent')},
                           4 => {goToPage('objects_for_rent')},

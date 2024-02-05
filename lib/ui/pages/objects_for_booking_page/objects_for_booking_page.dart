@@ -3,15 +3,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/widgets/drawer_menu.dart';
+import 'package:qaz_booking_ui/ui/widgets/drawer_menu.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/splash_button.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
-class ObjectsForRentPage extends StatelessWidget {
-  const ObjectsForRentPage({super.key, this.routeState});
+class ObjectsForBookingPage extends StatelessWidget {
+  const ObjectsForBookingPage({super.key, this.routeState});
   final GoRouterState? routeState;
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,9 @@ class ObjectsForRentPage extends StatelessWidget {
                   itemCount: 20,
                   itemBuilder: (ctx, index) {
                     return SplashButton(
-                      onTap: () {},
+                      onTap: () {
+                        context.pushNamed('booking_object');
+                      },
                       child: SizedBox(
                         height: 97,
                         width: double.infinity,

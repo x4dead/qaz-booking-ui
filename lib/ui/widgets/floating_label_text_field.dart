@@ -29,6 +29,19 @@ class FloatingLabelTextField extends StatefulWidget {
     this.hintStyle,
     this.textAlign,
     this.floatingLabelBgColor = AppColors.colorWhite,
+    this.onTap,
+    this.focusedBorder,
+    this.enabled,
+    this.disabledBorder,
+    this.readOnly,
+    this.onTapOutside,
+    this.border,
+    this.enabledBorder,
+    this.constraints,
+    this.contentPadding,
+    this.floatingLabelTopPosition,
+    this.floatingLabelLeftPosition,
+    this.textInputAction,
   });
 
   final TextEditingController controller;
@@ -44,8 +57,11 @@ class FloatingLabelTextField extends StatefulWidget {
   final int? maxLines;
   final int? maxLength;
   final bool obscureText;
+  final bool? enabled;
+  final bool? readOnly;
   final Widget? suffix;
   final void Function()? onEditingComplete;
+  final VoidCallback? onTap;
   final void Function(String?)? onSaved;
   final void Function(String)? onFieldSubmitted;
   final void Function(String)? onChanged;
@@ -53,6 +69,16 @@ class FloatingLabelTextField extends StatefulWidget {
   final Color? focusedColor;
   final TextAlign? textAlign;
   final Color? floatingLabelBgColor;
+  final InputBorder? focusedBorder;
+  final InputBorder? disabledBorder;
+  final InputBorder? border;
+  final InputBorder? enabledBorder;
+  final void Function(PointerDownEvent)? onTapOutside;
+  final BoxConstraints? constraints;
+  final EdgeInsetsGeometry? contentPadding;
+  final double? floatingLabelTopPosition;
+  final double? floatingLabelLeftPosition;
+  final TextInputAction? textInputAction;
   @override
   State<FloatingLabelTextField> createState() => _FloatingLabelTextFieldState();
 }
@@ -96,6 +122,11 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
             clipBehavior: Clip.none,
             children: [
               TextFormField(
+                textInputAction: widget.textInputAction ?? TextInputAction.go,
+                onTapOutside: widget.onTapOutside,
+                readOnly: widget.readOnly ?? false,
+                enabled: widget.enabled ?? true,
+                onTap: widget.onTap,
                 focusNode: widget.myFocusNode,
                 onFieldSubmitted: widget.onFieldSubmitted,
                 onSaved: widget.onSaved,
@@ -104,7 +135,9 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
                 obscureText: widget.obscureText,
                 inputFormatters: inputFormatters,
                 onChanged: widget.onChanged,
-                maxLines: widget.maxLines,
+                maxLines: null,
+                expands: true,
+                // widget.maxLines,
                 maxLength: widget.maxLength,
                 controller: widget.controller,
                 validator: widget.validator,
@@ -112,22 +145,23 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
                 cursorWidth: 1,
                 textAlign: widget.textAlign ?? TextAlign.start,
                 decoration: InputDecoration(
-                    // constraints:
-                    // const BoxConstraints(maxHeight: 56, minHeight: 56),
-                    enabledBorder: border,
-                    border: border,
-                    focusedBorder: border,
+                    constraints: widget.constraints ??
+                        const BoxConstraints(maxHeight: 56, minHeight: 56),
+                    enabledBorder: widget.enabledBorder ?? border,
+                    disabledBorder: widget.disabledBorder ?? border,
+                    border: widget.border ?? border,
+                    focusedBorder: widget.focusedBorder ?? border,
                     focusColor: widget.focusedColor,
                     suffixIcon: widget.suffix,
                     hintText: widget.hintText,
-                    contentPadding: kPH20V18Dot5,
+                    contentPadding: widget.contentPadding ?? kPH20V18Dot5,
                     hintStyle: widget.hintStyle ??
                         AppTextStyle.w500s16
                             .copyWith(color: AppColors.colorGray)),
               ),
               Positioned(
-                top: -8,
-                left: 22,
+                top: widget.floatingLabelTopPosition ?? -8,
+                left: widget.floatingLabelLeftPosition ?? 22,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   height: 17,

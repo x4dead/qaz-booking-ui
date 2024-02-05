@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
@@ -39,7 +40,7 @@ class CustomAppBar extends StatelessWidget {
               child: IconButton(
                   onPressed: leading?.$2 ??
                       () {
-                        Navigator.pop(context);
+                        context.pop();
                       },
                   icon: leading?.$1 ?? SvgPicture.asset(AppImages.arrowLeft)),
             ),
