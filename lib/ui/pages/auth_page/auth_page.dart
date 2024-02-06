@@ -20,13 +20,10 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size(double.infinity, 100),
-        child: CustomAppBar(leading: (
-          null,
-          () => context.go('/splash'),
-        )),
-      ),
+      appBar: CustomAppBar(leading: (
+        null,
+        () => context.go('/splash'),
+      )),
       body: Padding(
         padding: kPH20,
         child: Column(

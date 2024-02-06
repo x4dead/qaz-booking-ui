@@ -6,7 +6,7 @@ import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
-class CustomAppBar extends StatelessWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     this.title = 'Авторизация',
@@ -17,9 +17,11 @@ class CustomAppBar extends StatelessWidget {
   final (Widget?, VoidCallback?)? leading;
   final (Widget, VoidCallback)? action;
   @override
+  Size get preferredSize => const Size.fromHeight(100);
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
+      height: preferredSize.height,
       width: double.infinity,
       padding: kPH20V12,
       alignment: Alignment.bottomCenter,

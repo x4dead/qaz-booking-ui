@@ -21,13 +21,10 @@ class ObjectsForBookingPage extends StatelessWidget {
       key: globalKey,
       backgroundColor: AppColors.colorWhite,
       drawer: DrawerMenu(routeState: routeState),
-      appBar: PreferredSize(
-        preferredSize: const Size(double.infinity, 100),
-        child: CustomAppBar(title: 'Сдаваемые объекты (20)', leading: (
-          SvgPicture.asset(AppImages.menu),
-          () => globalKey.currentState?.openDrawer(),
-        )),
-      ),
+      appBar: CustomAppBar(title: 'Сдаваемые объекты (20)', leading: (
+        SvgPicture.asset(AppImages.menu),
+        () => globalKey.currentState?.openDrawer(),
+      )),
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: [

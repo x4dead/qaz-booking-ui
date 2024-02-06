@@ -86,16 +86,13 @@ class _MainPageState extends State<MainPage> {
       backgroundColor: AppColors.colorWhite,
       key: globalKey,
       drawer: DrawerMenu(routeState: widget.routeState),
-      appBar: PreferredSize(
-        preferredSize: const Size(double.infinity, 100),
-        child: CustomAppBar(title: 'QazBooking', action: (
-          SvgPicture.asset(AppImages.days),
-          () {}
-        ), leading: (
-          SvgPicture.asset(AppImages.menu),
-          () => globalKey.currentState?.openDrawer(),
-        )),
-      ),
+      appBar: CustomAppBar(title: 'QazBooking', action: (
+        SvgPicture.asset(AppImages.days),
+        () {}
+      ), leading: (
+        SvgPicture.asset(AppImages.menu),
+        () => globalKey.currentState?.openDrawer(),
+      )),
       // body:
       // Row(
       //   mainAxisSize: MainAxisSize.min,
