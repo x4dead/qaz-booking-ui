@@ -24,4 +24,5 @@ abstract class AppImages {
   static const person = 'assets/svg/person.svg';
   static const plus = 'assets/svg/plus.svg';
   static const tenge = 'assets/svg/₸.svg';
+  static const time = 'assets/svg/time.svg';
 }
