@@ -3,11 +3,14 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
+import 'package:qaz_booking_ui/ui/pages/archive_page/archive_page.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
 import 'package:qaz_booking_ui/ui/pages/booking_object_page/booking_object_page.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
 import 'package:qaz_booking_ui/ui/pages/objects_for_booking_page/objects_for_booking_page.dart';
-import 'package:qaz_booking_ui/ui/pages/splash_screen/splah_screen.dart';
+import 'package:qaz_booking_ui/ui/pages/splash_screen/splash_screen.dart';
+import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/utils/router/fade_transition.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -62,6 +65,14 @@ class AppRouter {
           },
         ),
         GoRoute(
+          name: 'archive',
+          path: '/archive',
+          pageBuilder: (context, state) {
+            return FadeTransitionPage(
+                child: ArchivePage(routeState: state), key: state.pageKey);
+          },
+        ),
+        GoRoute(
           name: 'booking_object',
           path: '/booking_object',
           pageBuilder: (context, state) {
@@ -70,8 +81,12 @@ class AppRouter {
           },
         ),
       ],
-      errorBuilder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Not found route'))));
+      errorBuilder: (context, state) => Scaffold(
+          backgroundColor: AppColors.colorWhite,
+          appBar: CustomAppBar(
+              title: 'Not found page',
+              leading: (null, () => context.go('/main'))),
+          body: const Center(child: Text('Not found route'))));
 }
 
 class GoRouterObserver extends NavigatorObserver {

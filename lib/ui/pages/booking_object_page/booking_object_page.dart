@@ -2,7 +2,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
-import 'package:qaz_booking_ui/ui/pages/booking_object_page/widgets/dashed_rect.dart';
+import 'package:qaz_booking_ui/ui/widgets/dashed_rect.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_button.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_dropdown_menu.dart';

@@ -1,8 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/ui/widgets/floating_label_text_field.dart';
