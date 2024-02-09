@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
+import 'package:qaz_booking_ui/ui/pages/guest_info_page/custom_calendar_dialog.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_chip.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_button.dart';
@@ -69,6 +70,30 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
     listImgs.value[index] = url;
   }
 
+  DateTime? initArrivalSelectedDate;
+
+  DateTime? initDepartureSelectedDate;
+  _showCalendarDialog(BuildContext ctx,
+      {required DateTime firstDate,
+      required DateTime initialDate,
+      required DateTime lastDate,
+      required void Function(DateTime) onDateChanged}) {
+    showDialog(
+        context: ctx,
+        builder: (ctx) => Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              insetPadding: kPAll20,
+              backgroundColor: AppColors.colorWhite,
+              surfaceTintColor: AppColors.colorWhite,
+              child: CustomCalendarDialog(
+                  firstDate: firstDate,
+                  initialDate: initialDate,
+                  lastDate: lastDate,
+                  onDateChanged: onDateChanged),
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     const colorsToSelect = [
@@ -111,6 +136,19 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
             children: [
               kSBH20,
               FloatingLabelTextField(
+                onTap: () {
+                  _showCalendarDialog(
+                    context,
+                    firstDate: DateTime(1900),
+                    initialDate: initArrivalSelectedDate ?? DateTime.now(),
+                    lastDate: DateTime(DateTime.now().year + 10),
+                    onDateChanged: (value) {
+                      arrivalDate.text = DateFormat("dd.MM.y").format(value);
+                      initArrivalSelectedDate = value;
+                    },
+                  );
+                },
+                readOnly: true,
                 suffix: getSuffix(AppImages.calendar),
                 controller: arrivalDate,
                 floatingLabelText: 'Дата заезда',
@@ -125,6 +163,19 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
               ),
               kSBH25,
               FloatingLabelTextField(
+                onTap: () {
+                  _showCalendarDialog(
+                    context,
+                    firstDate: DateTime(1900),
+                    initialDate: initDepartureSelectedDate ?? DateTime.now(),
+                    lastDate: DateTime(DateTime.now().year + 10),
+                    onDateChanged: (value) {
+                      departureDate.text = DateFormat("dd.MM.y").format(value);
+                      initDepartureSelectedDate = value;
+                    },
+                  );
+                },
+                readOnly: true,
                 suffix: getSuffix(AppImages.calendar),
                 controller: departureDate,
                 floatingLabelText: 'Дата выезда',
@@ -142,7 +193,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                 children: [
                   Flexible(
                     child: FloatingLabelTextField(
-                      controller: bookingStatus,
+                      controller: guestAdults,
                       floatingLabelText: 'Взрослые',
                       hintText: '0',
                     ),
@@ -150,7 +201,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                   kSBW12,
                   Flexible(
                     child: FloatingLabelTextField(
-                      controller: guestAdults,
+                      controller: guestChildren,
                       floatingLabelText: 'Дети',
                       hintText: '0',
                     ),
@@ -160,6 +211,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
               kSBH25,
               kSBH10,
               CustomDropdownMenu(
+                textEditingController: objectName,
                 initialSelectedObject: 'Комната 1',
                 onSelected: (p0) {},
                 floatingLabelText: 'Объект',
@@ -175,6 +227,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
               ),
               kSBH25,
               CustomDropdownMenu(
+                textEditingController: bookingStatus,
                 initialSelectedObject: 'Предоплата',
                 onSelected: (p0) {},
                 floatingLabelText: 'Статус бронирования',
@@ -302,7 +355,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
               kSBH25,
               kSBH10,
               FloatingLabelTextField(
-                controller: guestPhone,
+                controller: comment,
                 floatingLabelText: 'Комментарий',
                 hintText: 'Разбудить в 8:30',
               ),
