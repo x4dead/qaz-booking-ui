@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
-import 'package:qaz_booking_ui/ui/pages/guest_info_page/custom_calendar_dialog.dart';
+import 'package:qaz_booking_ui/ui/widgets/custom_calendar_dialog.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_chip.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_button.dart';
@@ -17,8 +17,8 @@ import 'dart:math' as math;
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
 class GuestInfoPage extends StatefulWidget {
-  const GuestInfoPage({super.key, this.isRegisterGuset = false});
-  final bool isRegisterGuset;
+  const GuestInfoPage({super.key, this.isRegisterGuest = false});
+  final bool isRegisterGuest;
 
   @override
   State<GuestInfoPage> createState() => _GuestInfoPageState();
@@ -31,7 +31,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
   final guestAdults = TextEditingController();
   final guestFullName = TextEditingController();
   final objectName = TextEditingController();
-
+  final paymentMethod = TextEditingController();
   final guestPhone = TextEditingController();
   final prepayment = TextEditingController();
   final payment = TextEditingController();
@@ -46,6 +46,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
     super.dispose();
     bookingStatus.dispose();
     guestChildren.dispose();
+    paymentMethod.dispose();
     guestAdults.dispose();
     guestFullName.dispose();
     objectName.dispose();
@@ -214,7 +215,8 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                 textEditingController: objectName,
                 initialSelectedObject: 'Комната 1',
                 onSelected: (p0) {},
-                floatingLabelText: 'Объект',
+                floatingLabelText:
+                    widget.isRegisterGuest == true ? 'Объект' : 'Комната',
                 hintText: "Введите текст",
                 menuObjects: const [
                   'Комната 1',
@@ -251,6 +253,20 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                 floatingLabelText: 'Телефон',
                 hintText: 'Введите номер телефона',
               ),
+              if (widget.isRegisterGuest == false) ...[
+                kSBH25,
+                CustomDropdownMenu(
+                  textEditingController: paymentMethod,
+                  initialSelectedObject: 'Наличные',
+                  onSelected: (p0) {},
+                  floatingLabelText: 'Способ оплаты',
+                  hintText: "Введите способ оплаты",
+                  menuObjects: const [
+                    'Наличные',
+                    'Перевод',
+                  ],
+                ),
+              ],
               kSBH25,
               Row(
                 children: [

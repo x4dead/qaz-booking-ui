@@ -85,8 +85,10 @@ class AppRouter {
           name: 'guest_info',
           path: '/guest_info',
           pageBuilder: (context, state) {
+            final map = state.extra as Map<String, dynamic>;
             return FadeTransitionPage(
-                child: const GuestInfoPage(), key: state.pageKey);
+                child: GuestInfoPage(isRegisterGuest: map["is_register_guest"]),
+                key: state.pageKey);
           },
         ),
       ],

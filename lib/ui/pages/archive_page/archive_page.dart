@@ -47,7 +47,8 @@ class _ArchivePageState extends State<ArchivePage> {
               itemBuilder: (ctx, index) {
                 return SplashButton(
                   onTap: () {
-                    context.pushNamed('guest_info');
+                    context.pushNamed('guest_info',
+                        extra: {"is_register_guest": false});
                   },
                   child: SizedBox(
                     height: 98,
