@@ -10,6 +10,7 @@ import 'package:qaz_booking_ui/ui/pages/booking_object_page/booking_object_page.
 import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
 import 'package:qaz_booking_ui/ui/pages/objects_for_booking_page/objects_for_booking_page.dart';
 import 'package:qaz_booking_ui/ui/pages/guest_info_page/guest_info_page.dart';
+import 'package:qaz_booking_ui/ui/pages/profile_page/profile_page.dart';
 import 'package:qaz_booking_ui/ui/pages/splash_screen/splash_screen.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/utils/router/fade_transition.dart';
@@ -89,6 +90,14 @@ class AppRouter {
             return FadeTransitionPage(
                 child: GuestInfoPage(isRegisterGuest: map["is_register_guest"]),
                 key: state.pageKey);
+          },
+        ),
+        GoRoute(
+          name: 'profile',
+          path: '/profile',
+          pageBuilder: (context, state) {
+            return FadeTransitionPage(
+                child: ProfilePage(routeState: state), key: state.pageKey);
           },
         ),
       ],

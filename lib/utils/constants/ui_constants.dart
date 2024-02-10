@@ -18,6 +18,7 @@ const kSBH16 = SizedBox(height: 16);
 const kSBW16 = SizedBox(width: 16);
 const kSBW6 = SizedBox(width: 6);
 const kSBH6 = SizedBox(height: 6);
+const kSBH5 = SizedBox(height: 5);
 const kSBH8 = SizedBox(height: 8);
 const kNothing = SizedBox.shrink();
 
