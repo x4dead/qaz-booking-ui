@@ -7,6 +7,7 @@ import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/pages/archive_page/archive_page.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
 import 'package:qaz_booking_ui/ui/pages/booking_object_page/booking_object_page.dart';
+import 'package:qaz_booking_ui/ui/pages/information_page/information_page.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
 import 'package:qaz_booking_ui/ui/pages/objects_for_booking_page/objects_for_booking_page.dart';
 import 'package:qaz_booking_ui/ui/pages/guest_info_page/guest_info_page.dart';
@@ -98,6 +99,14 @@ class AppRouter {
           pageBuilder: (context, state) {
             return FadeTransitionPage(
                 child: ProfilePage(routeState: state), key: state.pageKey);
+          },
+        ),
+        GoRoute(
+          name: 'information',
+          path: '/information',
+          pageBuilder: (context, state) {
+            return FadeTransitionPage(
+                child: InformationPage(routeState: state), key: state.pageKey);
           },
         ),
       ],
