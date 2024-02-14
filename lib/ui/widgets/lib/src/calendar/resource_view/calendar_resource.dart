@@ -85,6 +85,8 @@ class CalendarResource with Diagnosticable {
   CalendarResource(
       {this.displayName = '',
       required this.id,
+      this.object,
+      this.personsCount,
       this.image,
       this.color = Colors.lightBlue});
 
@@ -125,6 +127,8 @@ class CalendarResource with Diagnosticable {
   ///
   /// ```
   final String displayName;
+  final String? object;
+  final String? personsCount;
 
   /// The unique id for the [CalendarResource] view of [SfCalendar].
   ///

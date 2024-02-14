@@ -3,6 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
+import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 
@@ -15,10 +18,10 @@ import '../settings/time_slot_view_settings.dart';
 import '../settings/view_header_style.dart';
 
 /// Used to hold the time slots view on calendar timeline views.
-class TimelineWidgetV2 extends StatefulWidget {
+class TimelineWidget extends StatefulWidget {
   /// Constructor to create the timeline widget to holds time slots view for
   /// timeline views.
-  const TimelineWidgetV2(
+  const TimelineWidget(
       this.horizontalLinesCountPerView,
       this.visibleDates,
       this.timeSlotViewSettings,
@@ -37,46 +40,101 @@ class TimelineWidgetV2 extends StatefulWidget {
       this.timeRegionBuilder,
       this.width,
       this.height,
-      // this.minDate,
-      // this.maxDate,
+      this.minDate,
+      this.maxDate,
       this.blackoutDates);
+
+  /// Defines the total number of time slots needed in the view.
   final double horizontalLinesCountPerView;
+
+  /// Holds the visible dates collection for current timeline view.
   final List<DateTime> visibleDates;
+
+  /// Defines the timeline view slot setting used to customize the time slots.
   final TimeSlotViewSettings timeSlotViewSettings;
+
+  /// Defines the width of time slot view.
   final double timeIntervalWidth;
+
+  /// Defines the time slot border color.
   final Color? cellBorderColor;
+
+  /// Holds the theme data value for calendar.
   final SfCalendarThemeData calendarTheme;
+
+  /// Holds the framework theme data values.
   final ThemeData themeData;
+
+  /// Defines the direction of the calendar widget is RTL or not.
   final bool isRTL;
+
+  /// Used to draw the hovering on timeline view.
   final ValueNotifier<Offset?> calendarCellNotifier;
+
+  /// Used to get the current scroll position of the timeline view.
   final ScrollController scrollController;
+
+  /// Defines the special time region for the current timeline view.
   final List<CalendarTimeRegion>? specialRegion;
+
+  /// Defines the resource view item height.
   final double resourceItemHeight;
+
+  /// Holds the resource collection used to draw the time slots based on
+  /// resource value.
   final List<CalendarResource>? resourceCollection;
+
+  /// Defines the scale factor for the time slot time text.
   final double textScaleFactor;
+
+  /// Defines the current platform is mobile platform or not.
   final bool isMobilePlatform;
+
+  /// Holds the current timeline widget width.
   final double width;
+
+  /// Holds the current timeline widget height.
   final double height;
+
+  /// Used to build the widget that replaces the time regions in timeline view.
   final TimeRegionBuilder? timeRegionBuilder;
+
+  /// Defines the min date of the calendar.
+  final DateTime minDate;
+
+  /// Defines the max date of the calendar.
+  final DateTime maxDate;
+
+  /// Holds the blackout dates collection of calendar.
   final List<DateTime>? blackoutDates;
 
   @override
   // ignore: library_private_types_in_public_api
-  _TimelineWidgetV2State createState() => _TimelineWidgetV2State();
+  _TimelineWidgetState createState() => _TimelineWidgetState();
 }
 
-class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
+class _TimelineWidgetState extends State<TimelineWidget> {
   final List<Widget> _children = <Widget>[];
   List<TimeRegionView> _specialRegionViews = <TimeRegionView>[];
+  DateTime currentDate = DateTime.now();
 
   @override
   void initState() {
     _updateSpecialRegionDetails();
     super.initState();
+    for (int k = 1; k < widget.visibleDates.length; k++) {
+      currentDate = widget.visibleDates[k];
+      // if (currentDate.isBefore(regionStartTime)) {
+      //   continue;
+      // }
+
+      // startIndex = k;
+      // break;
+    }
   }
 
   @override
-  void didUpdateWidget(TimelineWidgetV2 oldWidget) {
+  void didUpdateWidget(TimelineWidget oldWidget) {
     if (widget.visibleDates != oldWidget.visibleDates ||
         widget.timeIntervalWidth != oldWidget.timeIntervalWidth ||
         widget.timeSlotViewSettings != oldWidget.timeSlotViewSettings ||
@@ -86,7 +144,7 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
         widget.width != oldWidget.width ||
         widget.height != oldWidget.height ||
         widget.timeRegionBuilder != oldWidget.timeRegionBuilder ||
-        !CalendarViewHelperV2.isCollectionEqual(
+        !CalendarViewHelper.isCollectionEqual(
             widget.specialRegion, oldWidget.specialRegion)) {
       _updateSpecialRegionDetails();
       _children.clear();
@@ -112,7 +170,87 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
       }
     }
 
-    return _TimelineRenderWidget(
+    return
+        // ListView(shrinkWrap: true, children: [
+        //   SizedBox(
+        //     height: 90,
+        //     child: ListView.separated(
+        //       shrinkWrap: true,
+        //       separatorBuilder: (context, index) => kSBW6,
+        //       itemCount: widget.visibleDates.length,
+        //       itemBuilder: (context, index) {
+        //         final now = DateTime.now();
+        //         final visibleDate = widget.visibleDates[index];
+        //         final isToday = visibleDate.day == now.day &&
+        //             visibleDate.month == now.month &&
+        //             visibleDate.year == now.year;
+
+        //         return SizedBox(
+        //           height: widget.resourceItemHeight,
+        //           // width: 52,
+        //           child: Center(
+        //             child: ResourceViewHeader(
+        //                 weekDay:
+        //                     shortWeekDays[widget.visibleDates[index].weekday - 1],
+        //                 bgColor: AppColors.colorLightGray,
+        //                 day: widget.visibleDates[index].day.toString(),
+        //                 textColor: AppColors.colorGray),
+        //           ),
+        //         );
+        //       },
+        //       padding: const EdgeInsets.symmetric(horizontal: 3),
+        //       // controller: widget.scrollController,
+        //       scrollDirection: Axis.horizontal,
+        //       physics: const NeverScrollableScrollPhysics(),
+        //       // children: <Widget>[
+        //       //   CustomPaint(
+        //       //     painter: _timelineViewHeader,
+        //       //     size: Size(width, height),
+        //       //   )
+        //       // ]
+        //     ),
+        //   ),
+        //   SizedBox(
+        //     height: 90,
+        //     child: ListView.separated(
+        //       shrinkWrap: true,
+        //       separatorBuilder: (context, index) => kSBW6,
+        //       itemCount: widget.visibleDates.length,
+        //       itemBuilder: (context, index) {
+        //         final now = DateTime.now();
+        //         final visibleDate = widget.visibleDates[index];
+        //         final isToday = visibleDate.day == now.day &&
+        //             visibleDate.month == now.month &&
+        //             visibleDate.year == now.year;
+
+        //         return SizedBox(
+        //           height: widget.resourceItemHeight,
+        //           // width: 52,
+        //           child: Center(
+        //             child: ResourceViewHeader(
+        //                 weekDay:
+        //                     shortWeekDays[widget.visibleDates[index].weekday - 1],
+        //                 bgColor: AppColors.colorLightGray,
+        //                 day: widget.visibleDates[index].day.toString(),
+        //                 textColor: AppColors.colorGray),
+        //           ),
+        //         );
+        //       },
+        //       padding: const EdgeInsets.symmetric(horizontal: 3),
+        //       // controller: widget.scrollController,
+        //       scrollDirection: Axis.horizontal,
+        //       physics: const NeverScrollableScrollPhysics(),
+        //       // children: <Widget>[
+        //       //   CustomPaint(
+        //       //     painter: _timelineViewHeader,
+        //       //     size: Size(width, height),
+        //       //   )
+        //       // ]
+        //     ),
+        //   ),
+        // ]);
+
+        _TimelineRenderWidget(
       widget.horizontalLinesCountPerView,
       widget.visibleDates,
       widget.timeSlotViewSettings,
@@ -131,8 +269,8 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
       widget.width,
       widget.height,
       _specialRegionViews,
-      // widget.minDate,
-      // widget.maxDate,
+      widget.minDate,
+      widget.maxDate,
       widget.blackoutDates,
       widgets: _children,
     );
@@ -148,7 +286,7 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
     }
 
     final double minuteHeight = widget.timeIntervalWidth /
-        CalendarViewHelperV2.getTimeInterval(widget.timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(widget.timeSlotViewSettings);
     final DateTime startDate =
         AppointmentHelper.convertToStartTime(widget.visibleDates[0]);
     final DateTime endDate = AppointmentHelper.convertToEndTime(
@@ -162,7 +300,7 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
       final DateTime regionEndTime = region.actualEndTime;
 
       /// Check the start date and end date as same.
-      if (CalendarViewHelperV2.isSameTimeSlot(regionStartTime, regionEndTime)) {
+      if (CalendarViewHelper.isSameTimeSlot(regionStartTime, regionEndTime)) {
         continue;
       }
 
@@ -181,7 +319,7 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
       int endIndex = DateTimeHelper.getVisibleDateIndex(
           widget.visibleDates, regionEndTime);
 
-      double startXPosition = CalendarViewHelperV2.getTimeToPosition(
+      double startXPosition = CalendarViewHelper.getTimeToPosition(
           Duration(
               hours: regionStartTime.hour, minutes: regionStartTime.minute),
           widget.timeSlotViewSettings,
@@ -208,10 +346,12 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
           }
         }
 
+        /// Start date as non working day and its index as next date index.
+        /// so assign the position value as 0
         startXPosition = 0;
       }
 
-      double endXPosition = CalendarViewHelperV2.getTimeToPosition(
+      double endXPosition = CalendarViewHelper.getTimeToPosition(
           Duration(hours: regionEndTime.hour, minutes: regionEndTime.minute),
           widget.timeSlotViewSettings,
           minuteHeight);
@@ -264,7 +404,7 @@ class _TimelineWidgetV2State extends State<TimelineWidgetV2> {
           region.resourceIds != null &&
           region.resourceIds!.isNotEmpty) {
         for (int i = 0; i < region.resourceIds!.length; i++) {
-          final int index = CalendarViewHelperV2.getResourceIndex(
+          final int index = CalendarViewHelper.getResourceIndex(
               widget.resourceCollection, region.resourceIds![i]);
           topPosition = index * widget.resourceItemHeight;
           bottomPosition = topPosition + widget.resourceItemHeight;
@@ -318,8 +458,8 @@ class _TimelineRenderWidget extends MultiChildRenderObjectWidget {
       this.width,
       this.height,
       this.specialRegionBounds,
-      // this.minDate,
-      // this.maxDate,
+      this.minDate,
+      this.maxDate,
       this.blackoutDates,
       {List<Widget> widgets = const <Widget>[]})
       : super(children: widgets);
@@ -342,8 +482,8 @@ class _TimelineRenderWidget extends MultiChildRenderObjectWidget {
   final double width;
   final double height;
   final List<TimeRegionView> specialRegionBounds;
-  // final DateTime minDate;
-  // final DateTime maxDate;
+  final DateTime minDate;
+  final DateTime maxDate;
   final List<DateTime>? blackoutDates;
 
   @override
@@ -367,8 +507,8 @@ class _TimelineRenderWidget extends MultiChildRenderObjectWidget {
         width,
         height,
         specialRegionBounds,
-        // minDate,
-        // maxDate,
+        minDate,
+        maxDate,
         blackoutDates);
   }
 
@@ -393,8 +533,8 @@ class _TimelineRenderWidget extends MultiChildRenderObjectWidget {
       ..isMobilePlatform = isMobilePlatform
       ..width = width
       ..height = height
-      // ..minDate = minDate
-      // ..maxDate = maxDate
+      ..minDate = minDate
+      ..maxDate = maxDate
       ..blackoutDates = blackoutDates
       ..specialRegionBounds = specialRegionBounds;
   }
@@ -420,8 +560,8 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
       this._width,
       this._height,
       this.specialRegionBounds,
-      // this._minDate,
-      // this._maxDate,
+      this._minDate,
+      this._maxDate,
       this._blackoutDates);
 
   double _horizontalLinesCountPerView;
@@ -620,7 +760,7 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
   List<CalendarTimeRegion>? get specialRegion => _specialRegion;
 
   set specialRegion(List<CalendarTimeRegion>? value) {
-    if (CalendarViewHelperV2.isCollectionEqual(_specialRegion, value)) {
+    if (CalendarViewHelper.isCollectionEqual(_specialRegion, value)) {
       return;
     }
 
@@ -634,30 +774,29 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
 
   List<TimeRegionView> specialRegionBounds;
 
-  // DateTime _minDate;
+  DateTime _minDate;
 
-  // DateTime get minDate => _minDate;
+  DateTime get minDate => _minDate;
 
   set minDate(DateTime value) {
-    if (CalendarViewHelperV2.isSameTimeSlot(null, value)) {
+    if (CalendarViewHelper.isSameTimeSlot(_minDate, value)) {
       return;
     }
 
-    value;
+    _minDate = value;
     markNeedsPaint();
   }
 
-  // DateTime _maxDate;
+  DateTime _maxDate;
 
-  // DateTime get maxDate => _maxDate;
+  DateTime get maxDate => _maxDate;
 
   set maxDate(DateTime value) {
-    if (CalendarViewHelperV2.isSameTimeSlot(null, value)) {
+    if (CalendarViewHelper.isSameTimeSlot(_maxDate, value)) {
       return;
     }
 
-    // _maxDate =
-    value;
+    _maxDate = value;
     markNeedsPaint();
   }
 
@@ -666,7 +805,7 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
   List<DateTime>? get blackoutDates => _blackoutDates;
 
   set blackoutDates(List<DateTime>? value) {
-    if (CalendarViewHelperV2.isDateCollectionEqual(_blackoutDates, value)) {
+    if (CalendarViewHelper.isDateCollectionEqual(_blackoutDates, value)) {
       return;
     }
 
@@ -729,12 +868,12 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
         resourceCollection != null && resourceCollection!.isNotEmpty;
     final int visibleDatesCount = visibleDates.length;
     final bool isTimelineMonth = visibleDatesCount > DateTime.daysPerWeek;
-    // _minMaxExceeds(visibleDatesCount, isTimelineMonth,
-    // // maxDate,
-    // blackoutDates,
-    //     context.canvas);
+    _minMaxExceeds(visibleDatesCount, isTimelineMonth, minDate, maxDate,
+        blackoutDates, context.canvas);
     if (isNeedDefaultPaint) {
-      _addSpecialRegion(context.canvas, isResourceEnabled, isTimelineMonth);
+      // _addSpecialRegion(context.canvas, isResourceEnabled, isTimelineMonth);
+
+      child;
     } else {
       if (specialRegion == null || specialRegion!.isEmpty) {
         return;
@@ -755,41 +894,41 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
     _drawTimeline(context.canvas, isResourceEnabled, visibleDatesCount);
   }
 
-  // void _minMaxExceeds(
-  //     int visibleDatesCount,
-  //     bool isTimelineMonth,
-  //     // DateTime minDate,
-  //     // DateTime maxDate,
-  //     List<DateTime>? blackoutDates,
-  //     Canvas canvas) {
-  //   final DateTime visibleStartDate = visibleDates[0];
-  //   final DateTime visibleEndDate = visibleDates[visibleDatesCount - 1];
-  //   final int timeInterval =
-  //       CalendarViewHelper.getTimeInterval(timeSlotViewSettings);
+  void _minMaxExceeds(
+      int visibleDatesCount,
+      bool isTimelineMonth,
+      DateTime minDate,
+      DateTime maxDate,
+      List<DateTime>? blackoutDates,
+      Canvas canvas) {
+    final DateTime visibleStartDate = visibleDates[0];
+    final DateTime visibleEndDate = visibleDates[visibleDatesCount - 1];
+    final int timeInterval =
+        CalendarViewHelper.getTimeInterval(timeSlotViewSettings);
 
-  //   if (isDateWithInDateRange(visibleStartDate, visibleEndDate, minDate)) {
-  //     _drawDisabledDate(minDate, false, false, canvas, isTimelineMonth,
-  //         timeInterval, visibleDatesCount);
-  //   }
-  //   if (isDateWithInDateRange(visibleStartDate, visibleEndDate, maxDate)) {
-  //     _drawDisabledDate(maxDate, true, false, canvas, isTimelineMonth,
-  //         timeInterval, visibleDatesCount);
-  //   }
+    if (isDateWithInDateRange(visibleStartDate, visibleEndDate, minDate)) {
+      _drawDisabledDate(minDate, false, false, canvas, isTimelineMonth,
+          timeInterval, visibleDatesCount);
+    }
+    if (isDateWithInDateRange(visibleStartDate, visibleEndDate, maxDate)) {
+      _drawDisabledDate(maxDate, true, false, canvas, isTimelineMonth,
+          timeInterval, visibleDatesCount);
+    }
 
-  //   if (blackoutDates == null || !isTimelineMonth) {
-  //     return;
-  //   }
+    if (blackoutDates == null || !isTimelineMonth) {
+      return;
+    }
 
-  //   final int count = blackoutDates.length;
-  //   for (int i = 0; i < count; i++) {
-  //     final DateTime blackoutDate = blackoutDates[i];
-  //     if (isDateWithInDateRange(
-  //         visibleStartDate, visibleEndDate, blackoutDate)) {
-  //       _drawDisabledDate(blackoutDate, false, true, canvas, isTimelineMonth,
-  //           timeInterval, visibleDatesCount);
-  //     }
-  //   }
-  // }
+    final int count = blackoutDates.length;
+    for (int i = 0; i < count; i++) {
+      final DateTime blackoutDate = blackoutDates[i];
+      if (isDateWithInDateRange(
+          visibleStartDate, visibleEndDate, blackoutDate)) {
+        _drawDisabledDate(blackoutDate, false, true, canvas, isTimelineMonth,
+            timeInterval, visibleDatesCount);
+      }
+    }
+  }
 
   void _drawDisabledDate(
       DateTime disabledDate,
@@ -808,7 +947,7 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
 
     final double xPosition = isTimelineMonth
         ? 0
-        : CalendarViewHelperV2.getTimeToPosition(
+        : CalendarViewHelper.getTimeToPosition(
             Duration(hours: disabledDate.hour, minutes: disabledDate.minute),
             timeSlotViewSettings,
             minuteHeight);
@@ -837,9 +976,15 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
 
   void _drawTimeline(
       Canvas canvas, bool isResourceEnabled, int visibleDatesCount) {
+    RRect rect;
+    rect = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(5, 110), width: 46, height: 46),
+        Radius.circular(12));
     _linePainter.strokeWidth = 0.5;
+    _linePainter.style = PaintingStyle.fill;
     _linePainter.strokeCap = StrokeCap.round;
-    _linePainter.color = cellBorderColor ?? calendarTheme.cellBorderColor!;
+    _linePainter.color = AppColors.colorBlue;
+    // cellBorderColor ?? calendarTheme.cellBorderColor!;
     double startXPosition = 0;
     double endXPosition = size.width;
     double startYPosition = 0.5;
@@ -847,34 +992,34 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
 
     final Offset start = Offset(startXPosition, startYPosition);
     final Offset end = Offset(endXPosition, endYPosition);
-    canvas.drawLine(start, end, _linePainter);
+    canvas.drawRRect(rect, _linePainter);
 
     startXPosition = 0;
     endXPosition = 0;
     startYPosition = 0;
     endYPosition = size.height;
-    // if (isRTL) {
-    //   startXPosition = size.width;
-    //   endXPosition = size.width;
-    // }
+    if (isRTL) {
+      startXPosition = size.width;
+      endXPosition = size.width;
+    }
 
     final List<Offset> points = <Offset>[];
     for (int i = 0; i < horizontalLinesCountPerView * visibleDatesCount; i++) {
       if (isMobilePlatform) {
-        // points.add(Offset(startXPosition, startYPosition));
-        // points.add(Offset(endXPosition, endYPosition));
+        points.add(Offset(startXPosition, startYPosition));
+        points.add(Offset(endXPosition, endYPosition));
       } else {
-        // canvas.drawLine(Offset(startXPosition, startYPosition),
-        //     Offset(endXPosition, endYPosition), _linePainter);
+        canvas.drawLine(Offset(startXPosition, startYPosition),
+            Offset(endXPosition, endYPosition), _linePainter);
       }
 
-      // if (isRTL) {
-      //   startXPosition -= timeIntervalWidth;
-      //   endXPosition -= timeIntervalWidth;
-      // } else {
-      startXPosition += timeIntervalWidth;
-      endXPosition += timeIntervalWidth;
-      // }
+      if (isRTL) {
+        startXPosition -= timeIntervalWidth;
+        endXPosition -= timeIntervalWidth;
+      } else {
+        startXPosition += timeIntervalWidth;
+        endXPosition += timeIntervalWidth;
+      }
     }
 
     if (isMobilePlatform) {
@@ -1022,7 +1167,7 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
     final int startHourMinutes =
         ((timeSlotViewSettings.startHour - startHour) * 60).toInt();
     final int timeInterval =
-        CalendarViewHelperV2.getTimeInterval(timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(timeSlotViewSettings);
     for (int j = 0; j < visibleDates.length; j++) {
       DateTime date = visibleDates[j];
       for (int i = 0; i < horizontalLinesCountPerView; i++) {
@@ -1062,10 +1207,10 @@ class _TimelineRenderObject extends CustomCalendarRenderObject {
 }
 
 /// Used to hold the view header cells for timeline view.
-class TimelineViewHeaderViewV2 extends CustomPainter {
+class TimelineViewHeaderView extends CustomPainter {
   /// Constructor to create the view header view to holds header cell for
   /// timeline views.
-  TimelineViewHeaderViewV2(
+  TimelineViewHeaderView(
       this.visibleDates,
       this.timelineViewHeaderScrollController,
       this.repaintNotifier,
@@ -1075,11 +1220,11 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
       this.isRTL,
       this.todayHighlightColor,
       this.todayTextStyle,
-      // this.locale,
+      this.locale,
       this.calendarTheme,
       this.themeData,
-      // this.minDate,
-      // this.maxDate,
+      this.minDate,
+      this.maxDate,
       this.viewHeaderNotifier,
       this.cellBorderColor,
       this.blackoutDates,
@@ -1123,13 +1268,13 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
   final bool isRTL;
 
   /// Defines the locale of the calendar.
-  // final String locale;
+  final String locale;
 
   /// Defines the min date of the calendar.
-  // final DateTime minDate;
+  final DateTime minDate;
 
   /// Defines the max date of the calendar.
-  // final DateTime maxDate;
+  final DateTime maxDate;
 
   /// Holds the current view header hovering position used to paint hovering.
   final ValueNotifier<Offset?> viewHeaderNotifier;
@@ -1149,12 +1294,8 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
   final double textScaleFactor;
   final double _padding = 5;
   double _xPosition = 0;
-
-  final TextPainter _dateAndDayTextPainter = TextPainter();
-  // final TextPainter _dayTextPainter = TextPainter(
-  //       textAlign: TextAlign.center,
-  //     ),
-  // _dateTextPainter = TextPainter();
+  final TextPainter _dayTextPainter = TextPainter(),
+      _dateTextPainter = TextPainter();
   final Paint _hoverPainter = Paint();
 
   @override
@@ -1203,9 +1344,8 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
     TextStyle dayTextStyle = viewHeaderDayStyle;
     TextStyle dateTextStyle = viewHeaderDateStyle;
 
-    final Color? todayTextColor =
-        CalendarViewHelperV2.getTodayHighlightTextColor(
-            todayHighlightColor, todayTextStyle, calendarTheme);
+    final Color? todayTextColor = CalendarViewHelper.getTodayHighlightTextColor(
+        todayHighlightColor, todayTextStyle, calendarTheme);
 
     if (isTimelineMonth) {
       _hoverPainter.strokeWidth = 0.5;
@@ -1226,15 +1366,12 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
               ? 'EEEE'
               : timeSlotViewSettings.dayFormat;
 
-      final String dayText = DateFormat(
-        dayFormat,
-        // locale
-      ).format(currentDate);
+      final String dayText = DateFormat(dayFormat, locale).format(currentDate);
       final String dateText =
           DateFormat(timeSlotViewSettings.dateFormat).format(currentDate);
 
-      final bool isBlackoutDate = CalendarViewHelperV2.isDateInDateCollection(
-          blackoutDates, currentDate);
+      final bool isBlackoutDate =
+          CalendarViewHelper.isDateInDateCollection(blackoutDates, currentDate);
 
       if (isSameDate(currentDate, today)) {
         dayTextStyle = todayTextStyle != null
@@ -1262,42 +1399,40 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
         }
       }
 
-      // if (!isDateWithInDateRange(minDate, maxDate, currentDate)) {
-      dayTextStyle = dayTextStyle.copyWith(
-          color: dayTextStyle.color != null
-              ? dayTextStyle.color!.withOpacity(0.38)
-              : calendarTheme.brightness == Brightness.light
-                  ? Colors.black26
-                  : Colors.white38);
-      dateTextStyle = dateTextStyle.copyWith(
-          color: dateTextStyle.color != null
-              ? dateTextStyle.color!.withOpacity(0.38)
-              : calendarTheme.brightness == Brightness.light
-                  ? Colors.black26
-                  : Colors.white38);
-      // }
+      if (!isDateWithInDateRange(minDate, maxDate, currentDate)) {
+        dayTextStyle = dayTextStyle.copyWith(
+            color: dayTextStyle.color != null
+                ? dayTextStyle.color!.withOpacity(0.38)
+                : calendarTheme.brightness == Brightness.light
+                    ? Colors.black26
+                    : Colors.white38);
+        dateTextStyle = dateTextStyle.copyWith(
+            color: dateTextStyle.color != null
+                ? dateTextStyle.color!.withOpacity(0.38)
+                : calendarTheme.brightness == Brightness.light
+                    ? Colors.black26
+                    : Colors.white38);
+      }
 
-      // final TextSpan dayTextSpan = TextSpan(text: dayText, style: dayTextStyle);
+      final TextSpan dayTextSpan = TextSpan(text: dayText, style: dayTextStyle);
 
-      // _dayTextPainter.text = dayTextSpan;
-      // _dayTextPainter.textDirection = TextDirection.ltr;
-      // _dayTextPainter.textAlign = TextAlign.left;
-      // _dayTextPainter.textWidthBasis = TextWidthBasis.longestLine;
-      // _dayTextPainter.textScaler = TextScaler.linear(textScaleFactor);
+      _dayTextPainter.text = dayTextSpan;
+      _dayTextPainter.textDirection = TextDirection.ltr;
+      _dayTextPainter.textAlign = TextAlign.left;
+      _dayTextPainter.textWidthBasis = TextWidthBasis.longestLine;
+      _dayTextPainter.textScaler = TextScaler.linear(textScaleFactor);
 
       final TextSpan dateTextSpan =
           TextSpan(text: dateText, style: dateTextStyle);
 
-      // _dateTextPainter.text = dateTextSpan;
-      // _dateTextPainter.textDirection = TextDirection.ltr;
-      // _dateTextPainter.textAlign = TextAlign.left;
-      // _dateTextPainter.textWidthBasis = TextWidthBasis.longestLine;
-      // _dateTextPainter.textScaler = TextScaler.linear(textScaleFactor);
+      _dateTextPainter.text = dateTextSpan;
+      _dateTextPainter.textDirection = TextDirection.ltr;
+      _dateTextPainter.textAlign = TextAlign.left;
+      _dateTextPainter.textWidthBasis = TextWidthBasis.longestLine;
+      _dateTextPainter.textScaler = TextScaler.linear(textScaleFactor);
 
-      // _dayTextPainter.layout(maxWidth: childWidth);
-      // _dateTextPainter.layout(maxWidth: childWidth);
-      _dateAndDayTextPainter.text =
-          TextSpan(text: 'ПТ\n', children: [TextSpan(text: '19')]);
+      _dayTextPainter.layout(maxWidth: childWidth);
+      _dateTextPainter.layout(maxWidth: childWidth);
       if (isTimelineMonth) {
         canvas.save();
         _drawTimelineMonthViewHeader(canvas, childWidth, size, isBlackoutDate);
@@ -1309,45 +1444,43 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
 
   void _drawTimelineTimeSlotsViewHeader(
       Canvas canvas, Size size, double childWidth, int index, int i) {
-    // if (_dateTextPainter.width +
-    //         _xPosition +
-    //         (_padding * 2) +
-    //         _dayTextPainter.width >
-    //     (i + 1) * childWidth) {
-    //   _xPosition = ((i + 1) * childWidth) -
-    //       (_dateTextPainter.width + (_padding * 2) + _dayTextPainter.width);
-    // }
+    if (_dateTextPainter.width +
+            _xPosition +
+            (_padding * 2) +
+            _dayTextPainter.width >
+        (i + 1) * childWidth) {
+      _xPosition = ((i + 1) * childWidth) -
+          (_dateTextPainter.width + (_padding * 2) + _dayTextPainter.width);
+    }
 
     if (viewHeaderNotifier.value != null) {
       _addMouseHovering(canvas, size);
     }
 
-    // if (isRTL) {
-    //   _dateTextPainter.paint(
-    //       canvas,
-    //       Offset(size.width - _xPosition - _padding - _dateTextPainter.width,
-    //           viewHeaderHeight / 2 - _dateTextPainter.height / 2));
-    //   _dayTextPainter.paint(
-    //       canvas,
-    //       Offset(
-    //           size.width -
-    //               _xPosition -
-    //               (_padding * 2) -
-    //               _dayTextPainter.width -
-    //               _dateTextPainter.width,
-    //           viewHeaderHeight / 2 - _dayTextPainter.height / 2));
-    // } else {
-    // _dateTextPainter.paint(
-    //     canvas,
-    //     // Offset(_padding + _xPosition, viewHeaderHeight / 2)
-    //     Offset(_padding + _xPosition,
-    //         viewHeaderHeight / 2 - _dateTextPainter.height / 2));
-    // _dayTextPainter.paint(
-    //     canvas,
-    //     Offset(_dateTextPainter.width + _xPosition + (_padding * 2),
-    //         viewHeaderHeight / 2 - _dayTextPainter.height / 2));
-    _dateAndDayTextPainter.paint(canvas, Offset(_xPosition, _xPosition));
-    // }
+    if (isRTL) {
+      _dateTextPainter.paint(
+          canvas,
+          Offset(size.width - _xPosition - _padding - _dateTextPainter.width,
+              viewHeaderHeight / 2 - _dateTextPainter.height / 2));
+      _dayTextPainter.paint(
+          canvas,
+          Offset(
+              size.width -
+                  _xPosition -
+                  (_padding * 2) -
+                  _dayTextPainter.width -
+                  _dateTextPainter.width,
+              viewHeaderHeight / 2 - _dayTextPainter.height / 2));
+    } else {
+      _dateTextPainter.paint(
+          canvas,
+          Offset(_padding + _xPosition,
+              viewHeaderHeight / 2 - _dateTextPainter.height / 2));
+      _dayTextPainter.paint(
+          canvas,
+          Offset(_dateTextPainter.width + _xPosition + (_padding * 2),
+              viewHeaderHeight / 2 - _dayTextPainter.height / 2));
+    }
 
     if (index == i) {
       _xPosition = (i + 1) * childWidth;
@@ -1362,42 +1495,31 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
     const double leftPadding = 2;
     final double startXPosition = _xPosition +
         (childWidth -
-                (_dateAndDayTextPainter.width
-                // _dateTextPainter.width
-                // +
-                // leftPadding +
-                // _dayTextPainter.width
-                )) /
+                (_dateTextPainter.width +
+                    leftPadding +
+                    _dayTextPainter.width)) /
             2;
     final double startYPosition = (size.height -
-            (_dateAndDayTextPainter.height
-            // _dayTextPainter.height
-            // > _dateTextPainter.height
-            // ? _dayTextPainter.height
-            // : _dateTextPainter.height
-            )) /
+            (_dayTextPainter.height > _dateTextPainter.height
+                ? _dayTextPainter.height
+                : _dateTextPainter.height)) /
         2;
     if (viewHeaderNotifier.value != null && !isBlackoutDate) {
       _addMouseHovering(canvas, size, childWidth);
     }
     if (!isRTL) {
-      _dateAndDayTextPainter.paint(
-          canvas, Offset(startXPosition, startYPosition));
-      // _dateTextPainter.paint(canvas, Offset(startXPosition, startYPosition));
-      // _dayTextPainter.paint(
-
-      // canvas,
-      // Offset(startXPosition + _dateTextPainter.width + leftPadding,
-      // startYPosition),
-      // );
+      _dateTextPainter.paint(canvas, Offset(startXPosition, startYPosition));
+      _dayTextPainter.paint(
+          canvas,
+          Offset(startXPosition + _dateTextPainter.width + leftPadding,
+              startYPosition));
+    } else {
+      _dayTextPainter.paint(canvas, Offset(startXPosition, startYPosition));
+      _dateTextPainter.paint(
+          canvas,
+          Offset(startXPosition + _dayTextPainter.width + leftPadding,
+              startYPosition));
     }
-    // else {
-    //   _dayTextPainter.paint(canvas, Offset(startXPosition, startYPosition));
-    //   _dateTextPainter.paint(
-    //       canvas,
-    //       Offset(startXPosition + _dayTextPainter.width + leftPadding,
-    //           startYPosition));
-    // }
 
     if (isRTL) {
       _xPosition -= childWidth;
@@ -1424,20 +1546,18 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
         ? size.width -
             _xPosition -
             (_padding * 2) -
-            _dateAndDayTextPainter.width
-        // _dayTextPainter.width -
-        // _dateTextPainter.width -
-        // _padding
+            _dayTextPainter.width -
+            _dateTextPainter.width -
+            _padding
         : _xPosition;
     final double rightPosition = isRTL && cellWidth == null
-            ? size.width - _xPosition
-            : cellWidth != null
-                ? _xPosition + cellWidth - _padding
-                : _xPosition + _dateAndDayTextPainter.width
-        // _dayTextPainter.width +
-        // _dateTextPainter.width +
-        // (2 * _padding)
-        ;
+        ? size.width - _xPosition
+        : cellWidth != null
+            ? _xPosition + cellWidth - _padding
+            : _xPosition +
+                _dayTextPainter.width +
+                _dateTextPainter.width +
+                (2 * _padding);
     if (leftPosition + difference <= viewHeaderNotifier.value!.dx &&
         rightPosition + difference >= viewHeaderNotifier.value!.dx &&
         (size.height) - _padding >= viewHeaderNotifier.value!.dy) {
@@ -1452,8 +1572,8 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(TimelineViewHeaderViewV2 oldDelegate) {
-    final TimelineViewHeaderViewV2 oldWidget = oldDelegate;
+  bool shouldRepaint(TimelineViewHeaderView oldDelegate) {
+    final TimelineViewHeaderView oldWidget = oldDelegate;
     final bool isTimelineMonth = visibleDates.length > DateTime.daysPerWeek;
     return oldWidget.visibleDates != visibleDates ||
         oldWidget.viewHeaderStyle != viewHeaderStyle ||
@@ -1461,14 +1581,14 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
         oldWidget.viewHeaderHeight != viewHeaderHeight ||
         oldWidget.todayHighlightColor != todayHighlightColor ||
         oldWidget.isRTL != isRTL ||
-        // oldWidget.locale != locale ||
+        oldWidget.locale != locale ||
         oldWidget.viewHeaderNotifier.value != viewHeaderNotifier.value ||
         oldWidget.todayTextStyle != todayTextStyle ||
         oldWidget.textScaleFactor != textScaleFactor ||
         oldWidget.calendarTheme != calendarTheme ||
         (isTimelineMonth &&
             (oldWidget.blackoutDatesTextStyle != blackoutDatesTextStyle ||
-                !CalendarViewHelperV2.isDateCollectionEqual(
+                !CalendarViewHelper.isDateCollectionEqual(
                     oldWidget.blackoutDates, blackoutDates)));
   }
 
@@ -1500,15 +1620,11 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
   String _getAccessibilityText(DateTime date) {
     final String textString = DateFormat('EEEEE').format(date) +
         DateFormat('dd/MMMM/yyyy').format(date);
-    if (!isDateWithInDateRange(
-        // minDate, maxDate,
-        null,
-        null,
-        date)) {
+    if (!isDateWithInDateRange(minDate, maxDate, date)) {
       return '$textString, Disabled date';
     }
 
-    if (CalendarViewHelperV2.isDateInDateCollection(blackoutDates, date)) {
+    if (CalendarViewHelper.isDateInDateCollection(blackoutDates, date)) {
       return '$textString, Blackout date';
     }
 
@@ -1527,8 +1643,8 @@ class TimelineViewHeaderViewV2 extends CustomPainter {
   }
 
   @override
-  bool shouldRebuildSemantics(TimelineViewHeaderViewV2 oldDelegate) {
-    final TimelineViewHeaderViewV2 oldWidget = oldDelegate;
+  bool shouldRebuildSemantics(TimelineViewHeaderView oldDelegate) {
+    final TimelineViewHeaderView oldWidget = oldDelegate;
     return oldWidget.visibleDates != visibleDates;
   }
 }

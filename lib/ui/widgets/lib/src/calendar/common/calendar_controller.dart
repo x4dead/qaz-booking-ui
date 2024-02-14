@@ -169,7 +169,7 @@ class CalendarController extends CalendarValueChangedNotifier {
   ///}
   /// ```
   set selectedDate(DateTime? date) {
-    if (CalendarViewHelperV2.isSameTimeSlot(_selectedDate, date)) {
+    if (CalendarViewHelper.isSameTimeSlot(_selectedDate, date)) {
       return;
     }
 

@@ -1,4 +1,5 @@
 ﻿import 'dart:convert';
+import 'dart:ui';
 
 class GuestModel {
   final String? arrivalDate;
@@ -15,10 +16,12 @@ class GuestModel {
   final String? prepayment;
   final String? payment;
   final List<String>? photosOfDocuments;
-  final String? color;
+  final Color? color;
   final String? comment;
+  final String? resourceId;
 
-  GuestModel({
+  const GuestModel({
+    this.resourceId,
     this.arrivalDate,
     this.arrivalTime,
     this.departureDate,
@@ -52,7 +55,7 @@ class GuestModel {
     String? prepayment,
     String? payment,
     List<String>? photosOfDocuments,
-    String? color,
+    Color? color,
     String? comment,
   }) =>
       GuestModel(

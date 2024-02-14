@@ -111,7 +111,8 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
           kSBW12,
           SvgPicture.asset(
             svg,
-            color: AppColors.colorGray,
+              colorFilter: const ColorFilter.mode(
+                AppColors.colorGray, BlendMode.srcIn),
           ),
           kSBW20,
         ],
@@ -125,7 +126,9 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
         action: (
           SvgPicture.asset(
             AppImages.save,
-            color: AppColors.colorBlack,
+              colorFilter: const ColorFilter.mode(
+                AppColors.colorBlack, BlendMode.srcIn),
+
           ),
           () {},
         ),

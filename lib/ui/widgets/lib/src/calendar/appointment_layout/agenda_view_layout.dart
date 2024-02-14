@@ -19,7 +19,7 @@ class AgendaViewLayout extends StatefulWidget {
       this.selectedDate,
       this.appointments,
       this.isRTL,
-      // this.locale,
+      this.locale,
       this.localizations,
       this.calendarTheme,
       this.themeData,
@@ -50,7 +50,7 @@ class AgendaViewLayout extends StatefulWidget {
   final bool isRTL;
 
   /// Defines the locale of the calendar widget
-  // final String locale;
+  final String locale;
 
   /// Holds the theme data of the calendar widget.
   final SfCalendarThemeData calendarTheme;
@@ -141,7 +141,7 @@ class _AgendaViewLayoutState extends State<AgendaViewLayout> {
         final CalendarAppointmentDetails details = CalendarAppointmentDetails(
             widget.selectedDate!,
             List<dynamic>.unmodifiable(<dynamic>[
-              CalendarViewHelperV2.getAppointmentDetail(
+              CalendarViewHelper.getAppointmentDetail(
                   view.appointment!, widget.calendar.dataSource)
             ]),
             view.appointmentRect!.outerRect);
@@ -156,7 +156,7 @@ class _AgendaViewLayoutState extends State<AgendaViewLayout> {
         widget.selectedDate,
         widget.appointments,
         widget.isRTL,
-        // widget.locale,
+        widget.locale,
         widget.localizations,
         widget.calendarTheme,
         widget.themeData,
@@ -177,7 +177,7 @@ class _AgendaViewLayoutState extends State<AgendaViewLayout> {
     const double padding = 5;
 
     final double totalAgendaViewWidth = widget.width + widget.timeLabelWidth;
-    final bool useMobilePlatformUI = CalendarViewHelperV2.isMobileLayoutUI(
+    final bool useMobilePlatformUI = CalendarViewHelper.isMobileLayoutUI(
         totalAgendaViewWidth, widget.isMobilePlatform);
     AppointmentHelper.resetAppointmentView(_appointmentCollection);
     _children.clear();
@@ -202,10 +202,10 @@ class _AgendaViewLayoutState extends State<AgendaViewLayout> {
             AppointmentHelper.orderAppointmentsAscending(
                 app1.isSpanned, app2.isSpanned));
     final double agendaItemHeight =
-        CalendarViewHelperV2.getScheduleAppointmentHeight(
+        CalendarViewHelper.getScheduleAppointmentHeight(
             widget.monthViewSettings, widget.scheduleViewSettings);
     final double agendaAllDayItemHeight =
-        CalendarViewHelperV2.getScheduleAllDayAppointmentHeight(
+        CalendarViewHelper.getScheduleAllDayAppointmentHeight(
             widget.monthViewSettings, widget.scheduleViewSettings);
 
     for (int i = 0; i < widget.appointments!.length; i++) {
@@ -253,7 +253,7 @@ class _AgendaViewRenderWidget extends MultiChildRenderObjectWidget {
       this.selectedDate,
       this.appointments,
       this.isRTL,
-      // this.locale,
+      this.locale,
       this.localizations,
       this.calendarTheme,
       this.themeData,
@@ -274,7 +274,7 @@ class _AgendaViewRenderWidget extends MultiChildRenderObjectWidget {
   final DateTime? selectedDate;
   final List<CalendarAppointment>? appointments;
   final bool isRTL;
-  // final String locale;
+  final String locale;
   final SfCalendarThemeData calendarTheme;
   final ThemeData themeData;
   final ValueNotifier<ScheduleViewHoveringDetails?> agendaViewNotifier;
@@ -296,7 +296,7 @@ class _AgendaViewRenderWidget extends MultiChildRenderObjectWidget {
       selectedDate,
       appointments,
       isRTL,
-      // locale,
+      locale,
       localizations,
       calendarTheme,
       themeData,
@@ -321,7 +321,7 @@ class _AgendaViewRenderWidget extends MultiChildRenderObjectWidget {
       ..selectedDate = selectedDate
       ..appointments = appointments
       ..isRTL = isRTL
-      // ..locale = locale
+      ..locale = locale
       ..localizations = localizations
       ..calendarTheme = calendarTheme
       ..themeData = themeData
@@ -343,7 +343,7 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
       this._selectedDate,
       this._appointments,
       this._isRTL,
-      // this._locale,
+      this._locale,
       this._localizations,
       this._calendarTheme,
       this._themeData,
@@ -445,22 +445,22 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
     markNeedsPaint();
   }
 
-  // String _locale;
+  String _locale;
 
-  // String get locale => _locale;
+  String get locale => _locale;
 
-  // set locale(String value) {
-  //   if (_locale == value) {
-  //     return;
-  //   }
+  set locale(String value) {
+    if (_locale == value) {
+      return;
+    }
 
-  //   _locale = value;
-  //   if (childCount != 0) {
-  //     return;
-  //   }
+    _locale = value;
+    if (childCount != 0) {
+      return;
+    }
 
-  //   markNeedsPaint();
-  // }
+    markNeedsPaint();
+  }
 
   SfLocalizations _localizations;
 
@@ -711,7 +711,7 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
     RenderBox? child = firstChild;
     final bool isNeedDefaultPaint = childCount == 0;
     final double totalAgendaViewWidth = size.width + timeLabelWidth;
-    final bool useMobilePlatformUI = CalendarViewHelperV2.isMobileLayoutUI(
+    final bool useMobilePlatformUI = CalendarViewHelper.isMobileLayoutUI(
         totalAgendaViewWidth, isMobilePlatform);
     final bool isLargerScheduleUI =
         scheduleViewSettings != null && !useMobilePlatformUI;
@@ -834,7 +834,7 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
         semanticsBuilder.add(CustomPainterSemantics(
           rect: appointmentView.appointmentRect!.outerRect,
           properties: SemanticsProperties(
-            label: CalendarViewHelperV2.getAppointmentSemanticsText(
+            label: CalendarViewHelper.getAppointmentSemanticsText(
                 appointmentView.appointment!),
             textDirection: TextDirection.ltr,
           ),
@@ -881,14 +881,14 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
                 fontSize: 13)
             .merge(scheduleViewSettings!.appointmentTextStyle);
 
-    final List<String> appointmentStringFormats = appointmentTimeTextFormat ==
-            null
-        ? <String>[]
-        : CalendarViewHelperV2.getListFromString(appointmentTimeTextFormat!);
+    final List<String> appointmentStringFormats =
+        appointmentTimeTextFormat == null
+            ? <String>[]
+            : CalendarViewHelper.getListFromString(appointmentTimeTextFormat!);
     final List<String> sameDateAppointmentStringFormats =
-        CalendarViewHelperV2.getListFromString('hh:mm a');
+        CalendarViewHelper.getListFromString('hh:mm a');
     final List<String> diffDateAppointmentStringFormats =
-        CalendarViewHelperV2.getListFromString('MMM dd, hh:mm a');
+        CalendarViewHelper.getListFromString('MMM dd, hh:mm a');
 
     //// Draw Appointments
     for (int i = 0; i < appointmentCollection.length; i++) {
@@ -1176,14 +1176,10 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
             ? sameDateAppointmentFormatString
             : diffDateAppointmentFormatString)
         : appointmentFormatString;
-    final String startDateText = CalendarViewHelperV2.getLocalizedString(
-      appointment.actualStartTime, format,
-      // locale
-    );
-    final String endDateText = CalendarViewHelperV2.getLocalizedString(
-      appointment.actualEndTime, format,
-      //  locale
-    );
+    final String startDateText = CalendarViewHelper.getLocalizedString(
+        appointment.actualStartTime, format, locale);
+    final String endDateText = CalendarViewHelper.getLocalizedString(
+        appointment.actualEndTime, format, locale);
     final TextSpan span = TextSpan(
         text: '$startDateText - $endDateText', style: appointmentTextStyle);
     _textPainter.text = span;
@@ -1273,8 +1269,8 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
   void _updateTextPainterProperties(TextSpan span) {
     _textPainter.text = span;
     _textPainter.maxLines = 1;
-    _textPainter.textDirection = TextDirection.ltr;
-    // CalendarViewHelper.getTextDirectionBasedOnLocale(locale);
+    _textPainter.textDirection =
+        CalendarViewHelper.getTextDirectionBasedOnLocale(locale);
     _textPainter.textAlign = TextAlign.left;
     _textPainter.textWidthBasis = TextWidthBasis.longestLine;
     _textPainter.textScaler = TextScaler.linear(textScaleFactor);
@@ -1334,14 +1330,10 @@ class _AgendaViewRenderObject extends CustomCalendarRenderObject {
     final List<String> format = appointmentFormatString.isEmpty
         ? sameDateAppointmentFormatString
         : appointmentFormatString;
-    final String startDateText = CalendarViewHelperV2.getLocalizedString(
-      appointment.actualStartTime, format,
-      // locale
-    );
-    final String endDateText = CalendarViewHelperV2.getLocalizedString(
-      appointment.actualEndTime, format,
-      // locale
-    );
+    final String startDateText = CalendarViewHelper.getLocalizedString(
+        appointment.actualStartTime, format, locale);
+    final String endDateText = CalendarViewHelper.getLocalizedString(
+        appointment.actualEndTime, format, locale);
     final TextSpan span = TextSpan(
         text: appointment.isAllDay || appointment.isSpanned
             ? _localizations.allDayLabel

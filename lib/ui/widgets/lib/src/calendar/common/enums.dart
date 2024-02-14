@@ -14,25 +14,25 @@ enum MonthNavigationDirection {
 /// Available views for [SfCalendar].
 enum CalendarView {
   /// - CalendarView.day, displays the day view.
-  // day,
+  day,
 
   /// - CalendarView.week, displays the week view.
-  // week,
+  week,
 
   /// - CalendarView.workWeek, displays the workweek view.
-  // workWeek,
-//
+  workWeek,
+
   /// - CalendarView.month, displays the month view.
-  // month,
+  month,
 
   /// - CalendarView.timelineDay, displays the timeline day view.
   timelineDay,
 
   /// - CalendarView.timelineWeek, displays the timeline week view.
-  // timelineWeek,
+  timelineWeek,
 
   /// - CalendarView.timelineWorkWeek, displays the timeline work week view.
-  // timelineWorkWeek,
+  timelineWorkWeek,
 
   /// CalendarView.timelineMonth, refers to the timeline month view in
   /// [SfCalendar].
@@ -46,7 +46,7 @@ enum CalendarView {
   timelineMonth,
 
   /// - CalendarView.schedule, displays the schedule view.
-  // schedule
+  schedule
 }
 
 /// Available appointment display mode for [SfCalendar] month cell.

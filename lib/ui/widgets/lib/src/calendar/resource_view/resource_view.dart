@@ -92,7 +92,11 @@ class _ResourceViewWidgetState extends State<ResourceViewWidget> {
       }
     }
 
-    return _ResourceViewRenderObjectWidget(
+    return
+        // Column(children: children
+        // List.generate(widget.resources?.length??0, (index) => )
+        // );
+        _ResourceViewRenderObjectWidget(
       widget.resources,
       widget.resourceViewSettings,
       widget.resourceItemHeight,

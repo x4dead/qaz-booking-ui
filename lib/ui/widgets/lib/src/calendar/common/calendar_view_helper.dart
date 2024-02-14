@@ -39,7 +39,7 @@ const double _kMobileViewWidth = 767;
 // ignore: avoid_classes_with_only_static_members
 /// Holds the static helper methods used for calendar views rendering
 /// in calendar.
-class CalendarViewHelperV2 {
+class CalendarViewHelper {
   /// Return the current context direction is RTL or not.
   static bool isRTLLayout(BuildContext context) {
     final TextDirection direction = Directionality.of(context);
@@ -102,17 +102,11 @@ class CalendarViewHelperV2 {
 
   /// Return the localized date value based on locale and string format list.
   static String getLocalizedString(
-    DateTime date,
-    List<String> stringFormatList,
-    // String locale
-  ) {
+      DateTime date, List<String> stringFormatList, String locale) {
     String localizedString = '';
     for (int i = 0; i < stringFormatList.length; i++) {
       final String value = stringFormatList[i];
-      final String valueString = getFormattedString(
-        date, value,
-        //  locale
-      );
+      final String valueString = getFormattedString(date, value, locale);
       localizedString = '$localizedString$valueString';
     }
 
@@ -121,10 +115,7 @@ class CalendarViewHelperV2 {
 
   /// Return the localized date value based on locale and string format.
   static String getFormattedString(
-    DateTime date,
-    String currentStringFormat,
-    // String locale
-  ) {
+      DateTime date, String currentStringFormat, String locale) {
     String formattedString = currentStringFormat;
     if (formattedString.isEmpty) {
       return formattedString;
@@ -158,10 +149,7 @@ class CalendarViewHelperV2 {
         currentStringFormat == 'M') {
       formattedString = DateFormat(currentStringFormat).format(date);
     } else {
-      formattedString = DateFormat(
-        currentStringFormat,
-        //  locale
-      ).format(date);
+      formattedString = DateFormat(currentStringFormat, locale).format(date);
     }
 
     return formattedString;
@@ -475,15 +463,15 @@ class CalendarViewHelperV2 {
 
     switch (view) {
       case CalendarView.timelineDay:
-        // case CalendarView.timelineWeek:
-        // case CalendarView.timelineWorkWeek:
+      case CalendarView.timelineWeek:
+      case CalendarView.timelineWorkWeek:
         return 30;
-      // case CalendarView.day:
-      // case CalendarView.week:
-      // case CalendarView.workWeek:
-      //   return 50;
-      // case CalendarView.schedule:
-      // case CalendarView.month:
+      case CalendarView.day:
+      case CalendarView.week:
+      case CalendarView.workWeek:
+        return 50;
+      case CalendarView.schedule:
+      case CalendarView.month:
       case CalendarView.timelineMonth:
         return 0;
     }
@@ -496,21 +484,21 @@ class CalendarViewHelperV2 {
       return viewHeaderHeight;
     }
 
-    // switch (view) {
-    //   case CalendarView.day:
-    //   case CalendarView.week:
-    //   case CalendarView.workWeek:
-    //     return 60;
-    //   case CalendarView.month:
-    //     return 25;
-    // case CalendarView.timelineDay:
-    // case CalendarView.timelineWeek:
-    // case CalendarView.timelineWorkWeek:
-    // case CalendarView.timelineMonth:
-    return 30;
-    //   case CalendarView.schedule:
-    //     return 0;
-    // }
+    switch (view) {
+      case CalendarView.day:
+      case CalendarView.week:
+      case CalendarView.workWeek:
+        return 60;
+      case CalendarView.month:
+        return 25;
+      case CalendarView.timelineDay:
+      case CalendarView.timelineWeek:
+      case CalendarView.timelineWorkWeek:
+      case CalendarView.timelineMonth:
+        return 30;
+      case CalendarView.schedule:
+        return 0;
+    }
   }
 
   /// Check the calendar view is day or not.
@@ -518,12 +506,12 @@ class CalendarViewHelperV2 {
       List<int>? nonWorkingDays, int numberOfWeeks) {
     final int daysCount = DateTimeHelper.getViewDatesCount(
         view, numberOfWeeks, numberOfDays, nonWorkingDays);
-    // if ((view == CalendarView.day ||
-    //         view == CalendarView.week ||
-    //         view == CalendarView.workWeek) &&
-    //     daysCount == 1) {
-    //   return true;
-    // }
+    if ((view == CalendarView.day ||
+            view == CalendarView.week ||
+            view == CalendarView.workWeek) &&
+        daysCount == 1) {
+      return true;
+    }
     return false;
   }
 
@@ -653,19 +641,19 @@ class CalendarViewHelperV2 {
 
   /// Check the calendar view is timeline view or not.
   static bool isTimelineView(CalendarView view) {
-    // switch (view) {
-    //   case CalendarView.timelineDay:
-    //   case CalendarView.timelineWeek:
-    //   case CalendarView.timelineWorkWeek:
-    //   case CalendarView.timelineMonth:
-    return true;
-    //   case CalendarView.day:
-    //   case CalendarView.week:
-    //   case CalendarView.workWeek:
-    //   case CalendarView.month:
-    //   case CalendarView.schedule:
-    //     return false;
-    // }
+    switch (view) {
+      case CalendarView.timelineDay:
+      case CalendarView.timelineWeek:
+      case CalendarView.timelineWorkWeek:
+      case CalendarView.timelineMonth:
+        return true;
+      case CalendarView.day:
+      case CalendarView.week:
+      case CalendarView.workWeek:
+      case CalendarView.month:
+      case CalendarView.schedule:
+        return false;
+    }
   }
 
   /// converts the given schedule appointment collection to their custom
@@ -742,13 +730,13 @@ class CalendarViewHelperV2 {
 
   /// Check the date before/same of last date
   static bool isSameOrBeforeDateTime(DateTime lastDate, DateTime date) {
-    return CalendarViewHelperV2.isSameTimeSlot(lastDate, date) ||
+    return CalendarViewHelper.isSameTimeSlot(lastDate, date) ||
         lastDate.isAfter(date);
   }
 
   /// Check the date after/same of first date
   static bool isSameOrAfterDateTime(DateTime firstDate, DateTime date) {
-    return CalendarViewHelperV2.isSameTimeSlot(firstDate, date) ||
+    return CalendarViewHelper.isSameTimeSlot(firstDate, date) ||
         firstDate.isBefore(date);
   }
 
@@ -760,29 +748,25 @@ class CalendarViewHelperV2 {
     /// calendar web and windows
     CalendarView view = controller.view!;
     if (event.isAltPressed) {
-      // if (event.logicalKey == LogicalKeyboardKey.digit1) {
-      //   view = CalendarView.day;
-      // } else if (event.logicalKey == LogicalKeyboardKey.digit2) {
-      //   view = CalendarView.week;
-      // } else if (event.logicalKey == LogicalKeyboardKey.digit3) {
-      //   view = CalendarView.workWeek;
-      // } else if (event.logicalKey == LogicalKeyboardKey.digit4) {
-      //   view = CalendarView.month;
-      // } else
-      if (event.logicalKey == LogicalKeyboardKey.digit5) {
+      if (event.logicalKey == LogicalKeyboardKey.digit1) {
+        view = CalendarView.day;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit2) {
+        view = CalendarView.week;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit3) {
+        view = CalendarView.workWeek;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit4) {
+        view = CalendarView.month;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit5) {
         view = CalendarView.timelineDay;
-      }
-      // else if (event.logicalKey == LogicalKeyboardKey.digit6) {
-      //   view = CalendarView.timelineWeek;
-      // } else if (event.logicalKey == LogicalKeyboardKey.digit7) {
-      //   view = CalendarView.timelineWorkWeek;
-      // }
-      else if (event.logicalKey == LogicalKeyboardKey.digit8) {
+      } else if (event.logicalKey == LogicalKeyboardKey.digit6) {
+        view = CalendarView.timelineWeek;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit7) {
+        view = CalendarView.timelineWorkWeek;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit8) {
         view = CalendarView.timelineMonth;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit9) {
+        view = CalendarView.schedule;
       }
-      // else if (event.logicalKey == LogicalKeyboardKey.digit9) {
-      //   view = CalendarView.schedule;
-      // }
     }
 
     if (allowedViews != null &&
@@ -823,9 +807,9 @@ class CalendarViewHelperV2 {
             (!isDateWithInDateRange(minDate, maxDate, appStartTime) ||
                 !isDateWithInDateRange(minDate, maxDate, appEndTime))) ||
         (!isMonthView &&
-            (!CalendarViewHelperV2.isDateTimeWithInDateTimeRange(
+            (!CalendarViewHelper.isDateTimeWithInDateTimeRange(
                     minDate, maxDate, appStartTime, timeInterval) ||
-                !CalendarViewHelperV2.isDateTimeWithInDateTimeRange(
+                !CalendarViewHelper.isDateTimeWithInDateTimeRange(
                     minDate, maxDate, appEndTime, timeInterval)))) {
       return true;
     }
@@ -1117,13 +1101,12 @@ class CalendarAppointment {
       otherAppointment = other;
     }
 
-    return CalendarViewHelperV2.isSameTimeSlot(
+    return CalendarViewHelper.isSameTimeSlot(
             otherAppointment.startTime, startTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(
-            otherAppointment.endTime, endTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(
+        CalendarViewHelper.isSameTimeSlot(otherAppointment.endTime, endTime) &&
+        CalendarViewHelper.isSameTimeSlot(
             otherAppointment.actualStartTime, actualStartTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(
+        CalendarViewHelper.isSameTimeSlot(
             otherAppointment.actualEndTime, actualEndTime) &&
         otherAppointment.isSpanned == isSpanned &&
         otherAppointment.startTimeZone == startTimeZone &&
@@ -1131,7 +1114,7 @@ class CalendarAppointment {
         otherAppointment.isAllDay == isAllDay &&
         otherAppointment.notes == notes &&
         otherAppointment.location == location &&
-        CalendarViewHelperV2.isCollectionEqual(
+        CalendarViewHelper.isCollectionEqual(
             otherAppointment.resourceIds, resourceIds) &&
         otherAppointment.recurrenceId == recurrenceId &&
         otherAppointment.id == id &&
@@ -1139,7 +1122,7 @@ class CalendarAppointment {
         otherAppointment.subject == subject &&
         otherAppointment.color == color &&
         otherAppointment.recurrenceRule == recurrenceRule &&
-        CalendarViewHelperV2.isDateCollectionEqual(
+        CalendarViewHelper.isDateCollectionEqual(
             otherAppointment.recurrenceExceptionDates,
             recurrenceExceptionDates);
   }
@@ -1288,16 +1271,16 @@ class CalendarTimeRegion {
       region = other;
     }
     return region.textStyle == textStyle &&
-        CalendarViewHelperV2.isSameTimeSlot(region.startTime, startTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(region.endTime, endTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(
+        CalendarViewHelper.isSameTimeSlot(region.startTime, startTime) &&
+        CalendarViewHelper.isSameTimeSlot(region.endTime, endTime) &&
+        CalendarViewHelper.isSameTimeSlot(
             region.actualStartTime, actualStartTime) &&
-        CalendarViewHelperV2.isSameTimeSlot(
+        CalendarViewHelper.isSameTimeSlot(
             region.actualStartTime, actualStartTime) &&
         region.color == color &&
         region.recurrenceRule == recurrenceRule &&
         region.enablePointerInteraction == enablePointerInteraction &&
-        CalendarViewHelperV2.isDateCollectionEqual(
+        CalendarViewHelper.isDateCollectionEqual(
             region.recurrenceExceptionDates, recurrenceExceptionDates) &&
         region.iconData == iconData &&
         region.timeZone == timeZone &&

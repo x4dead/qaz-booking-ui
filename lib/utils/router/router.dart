@@ -34,7 +34,7 @@ class AppRouter {
             // return '/main';
             // } else {
             // return '/splash';
-            return '/archive';
+            return '/auth';
             // }
           },
         ),

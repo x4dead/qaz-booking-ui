@@ -409,7 +409,7 @@ abstract class CalendarDataSource<T extends Object?>
     if (patternCalendarAppointment.recurrenceRule == null ||
         patternCalendarAppointment.recurrenceRule!.isEmpty) {
       return null;
-    } else if (CalendarViewHelperV2.isDateInDateCollection(
+    } else if (CalendarViewHelper.isDateInDateCollection(
         patternCalendarAppointment.recurrenceExceptionDates, date)) {
       final List<CalendarAppointment> dataSourceAppointments =
           AppointmentHelper.generateCalendarAppointments(

@@ -87,9 +87,9 @@ class RecurrenceProperties with Diagnosticable {
       : weekDays = weekDays ?? <WeekDays>[],
         assert(recurrenceCount >= 0),
         assert(endDate == null ||
-            CalendarViewHelperV2.isSameOrBeforeDateTime(endDate, startDate)),
+            CalendarViewHelper.isSameOrBeforeDateTime(endDate, startDate)),
         assert(endDate == null ||
-            CalendarViewHelperV2.isSameOrAfterDateTime(startDate, endDate)),
+            CalendarViewHelper.isSameOrAfterDateTime(startDate, endDate)),
         assert(interval >= 1),
         assert(week >= -2 && week <= 5),
         assert(dayOfMonth >= 1 && dayOfMonth <= 31),

@@ -9,23 +9,23 @@ class DateTimeHelper {
   static int getViewDatesCount(CalendarView calendarView, int numberOfWeeks,
       int daysCount, List<int>? nonWorkingDays) {
     switch (calendarView) {
-      // case CalendarView.month:
-      //   return DateTime.daysPerWeek * numberOfWeeks;
-      // case CalendarView.week:
-      // case CalendarView.timelineWeek:
-      //   return (daysCount >= 1 && daysCount <= 7)
-      //       ? daysCount
-      //       : DateTime.daysPerWeek;
-      // case CalendarView.workWeek:
-      // case CalendarView.timelineWorkWeek:
-      //   return (daysCount >= 1 && daysCount <= 7)
-      //       ? daysCount
-      //       : DateTime.daysPerWeek - nonWorkingDays!.length;
+      case CalendarView.month:
+        return DateTime.daysPerWeek * numberOfWeeks;
+      case CalendarView.week:
+      case CalendarView.timelineWeek:
+        return (daysCount >= 1 && daysCount <= 7)
+            ? daysCount
+            : DateTime.daysPerWeek;
+      case CalendarView.workWeek:
+      case CalendarView.timelineWorkWeek:
+        return (daysCount >= 1 && daysCount <= 7)
+            ? daysCount
+            : DateTime.daysPerWeek - nonWorkingDays!.length;
       case CalendarView.timelineDay:
-        // case CalendarView.day:
+      case CalendarView.day:
         return (daysCount >= 1 && daysCount <= 7) ? daysCount : 1;
-      // case CalendarView.schedule:
-      //   return 1;
+      case CalendarView.schedule:
+        return 1;
       case CalendarView.timelineMonth:
 
         /// 6 represents the number of weeks in view, we have used this static,
@@ -59,45 +59,45 @@ class DateTimeHelper {
       int visibleDatesCount,
       List<int>? nonWorkingDays) {
     switch (calendarView) {
-      // case CalendarView.month:
-      //   {
-      //     return numberOfWeeksInView == 6
-      //         ? DateTimeHelper.getDateTimeValue(getNextMonthDate(date))
-      //         : DateTimeHelper.getDateTimeValue(
-      //             addDays(date, numberOfWeeksInView * DateTime.daysPerWeek));
-      //   }
+      case CalendarView.month:
+        {
+          return numberOfWeeksInView == 6
+              ? DateTimeHelper.getDateTimeValue(getNextMonthDate(date))
+              : DateTimeHelper.getDateTimeValue(
+                  addDays(date, numberOfWeeksInView * DateTime.daysPerWeek));
+        }
       case CalendarView.timelineMonth:
         return DateTimeHelper.getDateTimeValue(getNextMonthDate(date));
-      // case CalendarView.week:
-      // case CalendarView.timelineWeek:
-      //   return DateTimeHelper.getDateTimeValue(
-      //       addDays(date, visibleDatesCount));
-      // case CalendarView.workWeek:
-      // case CalendarView.timelineWorkWeek:
-      //   {
-      //     final int nonWorkingDaysCount =
-      //         nonWorkingDays == null ? 0 : nonWorkingDays.length;
-      //     if (visibleDatesCount + nonWorkingDaysCount == 7) {
-      //       return DateTimeHelper.getDateTimeValue(
-      //           addDays(date, visibleDatesCount + nonWorkingDaysCount));
-      //     }
+      case CalendarView.week:
+      case CalendarView.timelineWeek:
+        return DateTimeHelper.getDateTimeValue(
+            addDays(date, visibleDatesCount));
+      case CalendarView.workWeek:
+      case CalendarView.timelineWorkWeek:
+        {
+          final int nonWorkingDaysCount =
+              nonWorkingDays == null ? 0 : nonWorkingDays.length;
+          if (visibleDatesCount + nonWorkingDaysCount == 7) {
+            return DateTimeHelper.getDateTimeValue(
+                addDays(date, visibleDatesCount + nonWorkingDaysCount));
+          }
 
-      //     for (int i = 0; i <= visibleDatesCount; i++) {
-      //       final dynamic currentDate = addDays(date, i);
-      //       if (nonWorkingDays != null &&
-      //           nonWorkingDays.contains(currentDate.weekday)) {
-      //         visibleDatesCount++;
-      //       }
-      //     }
-      //     return DateTimeHelper.getDateTimeValue(
-      //         addDays(date, visibleDatesCount));
-      //   }
-      // case CalendarView.day:
+          for (int i = 0; i <= visibleDatesCount; i++) {
+            final dynamic currentDate = addDays(date, i);
+            if (nonWorkingDays != null &&
+                nonWorkingDays.contains(currentDate.weekday)) {
+              visibleDatesCount++;
+            }
+          }
+          return DateTimeHelper.getDateTimeValue(
+              addDays(date, visibleDatesCount));
+        }
+      case CalendarView.day:
       case CalendarView.timelineDay:
         return DateTimeHelper.getDateTimeValue(
             addDays(date, visibleDatesCount));
-      // case CalendarView.schedule:
-      //   return DateTimeHelper.getDateTimeValue(addDays(date, 1));
+      case CalendarView.schedule:
+        return DateTimeHelper.getDateTimeValue(addDays(date, 1));
     }
   }
 
@@ -109,44 +109,44 @@ class DateTimeHelper {
       int visibleDatesCount,
       List<int>? nonWorkingDays) {
     switch (calendarView) {
-      // case CalendarView.month:
-      //   {
-      //     return numberOfWeeksInView == 6
-      //         ? DateTimeHelper.getDateTimeValue(getPreviousMonthDate(date))
-      //         : DateTimeHelper.getDateTimeValue(
-      //             addDays(date, -numberOfWeeksInView * DateTime.daysPerWeek));
-      //   }
+      case CalendarView.month:
+        {
+          return numberOfWeeksInView == 6
+              ? DateTimeHelper.getDateTimeValue(getPreviousMonthDate(date))
+              : DateTimeHelper.getDateTimeValue(
+                  addDays(date, -numberOfWeeksInView * DateTime.daysPerWeek));
+        }
       case CalendarView.timelineMonth:
         return DateTimeHelper.getDateTimeValue(getPreviousMonthDate(date));
-      // case CalendarView.week:
-      // case CalendarView.timelineWeek:
-      //   return DateTimeHelper.getDateTimeValue(
-      //       addDays(date, -visibleDatesCount));
-      // case CalendarView.workWeek:
-      // case CalendarView.timelineWorkWeek:
-      //   {
-      //     final int nonWorkingDaysCount =
-      //         nonWorkingDays == null ? 0 : nonWorkingDays.length;
-      //     if (visibleDatesCount + nonWorkingDaysCount == 7) {
-      //       return DateTimeHelper.getDateTimeValue(
-      //           addDays(date, -visibleDatesCount - nonWorkingDaysCount));
-      //     }
-      //     for (int i = 1; i <= visibleDatesCount; i++) {
-      //       final dynamic currentDate = addDays(date, -i);
-      //       if (nonWorkingDays != null &&
-      //           nonWorkingDays.contains(currentDate.weekday)) {
-      //         visibleDatesCount++;
-      //       }
-      //     }
-      //     return DateTimeHelper.getDateTimeValue(
-      //         addDays(date, -visibleDatesCount));
-      //   }
-      // case CalendarView.day:
+      case CalendarView.week:
+      case CalendarView.timelineWeek:
+        return DateTimeHelper.getDateTimeValue(
+            addDays(date, -visibleDatesCount));
+      case CalendarView.workWeek:
+      case CalendarView.timelineWorkWeek:
+        {
+          final int nonWorkingDaysCount =
+              nonWorkingDays == null ? 0 : nonWorkingDays.length;
+          if (visibleDatesCount + nonWorkingDaysCount == 7) {
+            return DateTimeHelper.getDateTimeValue(
+                addDays(date, -visibleDatesCount - nonWorkingDaysCount));
+          }
+          for (int i = 1; i <= visibleDatesCount; i++) {
+            final dynamic currentDate = addDays(date, -i);
+            if (nonWorkingDays != null &&
+                nonWorkingDays.contains(currentDate.weekday)) {
+              visibleDatesCount++;
+            }
+          }
+          return DateTimeHelper.getDateTimeValue(
+              addDays(date, -visibleDatesCount));
+        }
+      case CalendarView.day:
       case CalendarView.timelineDay:
         return DateTimeHelper.getDateTimeValue(
             addDays(date, -visibleDatesCount));
-      // case CalendarView.schedule:
-      //   return DateTimeHelper.getDateTimeValue(addDays(date, -1));
+      case CalendarView.schedule:
+        return DateTimeHelper.getDateTimeValue(addDays(date, -1));
     }
   }
 
@@ -227,26 +227,26 @@ class DateTimeHelper {
     }
 
     switch (calendarView) {
-      // case CalendarView.month:
-      //   {
-      //     if (numberOfWeeksInView != 6) {
-      //       final DateTime prevViewDate =
-      //           DateTimeHelper.getDateTimeValue(addDays(visibleDates[0], -1));
-      //       if (!isSameOrAfterDate(minDate, prevViewDate)) {
-      //         return false;
-      //       }
-      //     } else {
-      //       final DateTime currentDate = visibleDates[visibleDates.length ~/ 2];
-      //       final DateTime previousDate = DateTimeHelper.getDateTimeValue(
-      //           getPreviousMonthDate(currentDate));
-      //       if ((previousDate.month < minDate.month &&
-      //               previousDate.year == minDate.year) ||
-      //           previousDate.year < minDate.year) {
-      //         return false;
-      //       }
-      //     }
-      //   }
-      // break;
+      case CalendarView.month:
+        {
+          if (numberOfWeeksInView != 6) {
+            final DateTime prevViewDate =
+                DateTimeHelper.getDateTimeValue(addDays(visibleDates[0], -1));
+            if (!isSameOrAfterDate(minDate, prevViewDate)) {
+              return false;
+            }
+          } else {
+            final DateTime currentDate = visibleDates[visibleDates.length ~/ 2];
+            final DateTime previousDate = DateTimeHelper.getDateTimeValue(
+                getPreviousMonthDate(currentDate));
+            if ((previousDate.month < minDate.month &&
+                    previousDate.year == minDate.year) ||
+                previousDate.year < minDate.year) {
+              return false;
+            }
+          }
+        }
+        break;
       case CalendarView.timelineMonth:
         {
           final DateTime prevViewDate =
@@ -256,10 +256,10 @@ class DateTimeHelper {
           }
         }
         break;
-      // case CalendarView.day:
-      // case CalendarView.week:
+      case CalendarView.day:
+      case CalendarView.week:
       case CalendarView.timelineDay:
-        // case CalendarView.timelineWeek:
+      case CalendarView.timelineWeek:
         {
           DateTime prevViewDate = visibleDates[0];
           prevViewDate =
@@ -269,18 +269,18 @@ class DateTimeHelper {
           }
         }
         break;
-      // case CalendarView.timelineWorkWeek:
-      // case CalendarView.workWeek:
-      // {
-      //   final DateTime previousDate =
-      //       _getPreviousValidDate(visibleDates[0], nonWorkingDays);
-      //   if (!isSameOrAfterDate(minDate, previousDate)) {
-      //     return false;
-      //   }
-      // }
-      // break;
-      // case CalendarView.schedule:
-      //   return true;
+      case CalendarView.timelineWorkWeek:
+      case CalendarView.workWeek:
+        {
+          final DateTime previousDate =
+              _getPreviousValidDate(visibleDates[0], nonWorkingDays);
+          if (!isSameOrAfterDate(minDate, previousDate)) {
+            return false;
+          }
+        }
+        break;
+      case CalendarView.schedule:
+        return true;
     }
 
     return true;
@@ -301,26 +301,26 @@ class DateTimeHelper {
     }
 
     switch (calendarView) {
-      // case CalendarView.month:
-      //   {
-      //     if (numberOfWeeksInView != 6) {
-      //       final DateTime nextViewDate = DateTimeHelper.getDateTimeValue(
-      //           addDays(visibleDates[visibleDates.length - 1], 1));
-      //       if (!isSameOrBeforeDate(maxDate, nextViewDate)) {
-      //         return false;
-      //       }
-      //     } else {
-      //       final DateTime currentDate = visibleDates[visibleDates.length ~/ 2];
-      //       final DateTime nextDate =
-      //           DateTimeHelper.getDateTimeValue(getNextMonthDate(currentDate));
-      //       if ((nextDate.month > maxDate.month &&
-      //               nextDate.year == maxDate.year) ||
-      //           nextDate.year > maxDate.year) {
-      //         return false;
-      //       }
-      //     }
-      //   }
-      //   break;
+      case CalendarView.month:
+        {
+          if (numberOfWeeksInView != 6) {
+            final DateTime nextViewDate = DateTimeHelper.getDateTimeValue(
+                addDays(visibleDates[visibleDates.length - 1], 1));
+            if (!isSameOrBeforeDate(maxDate, nextViewDate)) {
+              return false;
+            }
+          } else {
+            final DateTime currentDate = visibleDates[visibleDates.length ~/ 2];
+            final DateTime nextDate =
+                DateTimeHelper.getDateTimeValue(getNextMonthDate(currentDate));
+            if ((nextDate.month > maxDate.month &&
+                    nextDate.year == maxDate.year) ||
+                nextDate.year > maxDate.year) {
+              return false;
+            }
+          }
+        }
+        break;
       case CalendarView.timelineMonth:
         {
           final DateTime nextViewDate = DateTimeHelper.getDateTimeValue(
@@ -330,10 +330,10 @@ class DateTimeHelper {
           }
         }
         break;
-      // case CalendarView.day:
-      // case CalendarView.week:
+      case CalendarView.day:
+      case CalendarView.week:
       case CalendarView.timelineDay:
-        // case CalendarView.timelineWeek:
+      case CalendarView.timelineWeek:
         {
           final DateTime nextViewDate = DateTimeHelper.getDateTimeValue(
               addDays(visibleDates[visibleDates.length - 1], 1));
@@ -342,18 +342,18 @@ class DateTimeHelper {
           }
         }
         break;
-      // case CalendarView.workWeek:
-      // case CalendarView.timelineWorkWeek:
-      //   {
-      //     final DateTime nextDate = _getNextValidDate(
-      //         visibleDates[visibleDates.length - 1], nonWorkingDays);
-      //     if (!isSameOrBeforeDate(maxDate, nextDate)) {
-      //       return false;
-      //     }
-      //   }
-      //   break;
-      // case CalendarView.schedule:
-      //   return true;
+      case CalendarView.workWeek:
+      case CalendarView.timelineWorkWeek:
+        {
+          final DateTime nextDate = _getNextValidDate(
+              visibleDates[visibleDates.length - 1], nonWorkingDays);
+          if (!isSameOrBeforeDate(maxDate, nextDate)) {
+            return false;
+          }
+        }
+        break;
+      case CalendarView.schedule:
+        return true;
     }
 
     return true;

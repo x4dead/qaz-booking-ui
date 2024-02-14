@@ -110,7 +110,7 @@ class _TimeSlotWidgetState extends State<TimeSlotWidget> {
         widget.width != oldWidget.width ||
         widget.height != oldWidget.height ||
         widget.timeRegionBuilder != oldWidget.timeRegionBuilder ||
-        !CalendarViewHelperV2.isCollectionEqual(
+        !CalendarViewHelper.isCollectionEqual(
             widget.specialRegion, oldWidget.specialRegion)) {
       _updateSpecialRegionDetails();
       _children.clear();
@@ -165,7 +165,7 @@ class _TimeSlotWidgetState extends State<TimeSlotWidget> {
     }
 
     final double minuteHeight = widget.timeIntervalHeight /
-        CalendarViewHelperV2.getTimeInterval(widget.timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(widget.timeSlotViewSettings);
     final DateTime startDate =
         AppointmentHelper.convertToStartTime(widget.visibleDates[0]);
     final int visibleDatesLength = widget.visibleDates.length;
@@ -179,7 +179,7 @@ class _TimeSlotWidgetState extends State<TimeSlotWidget> {
       final DateTime regionEndTime = region.actualEndTime;
 
       /// Check the start date and end date as same.
-      if (CalendarViewHelperV2.isSameTimeSlot(regionStartTime, regionEndTime)) {
+      if (CalendarViewHelper.isSameTimeSlot(regionStartTime, regionEndTime)) {
         continue;
       }
 
@@ -198,7 +198,7 @@ class _TimeSlotWidgetState extends State<TimeSlotWidget> {
       int endIndex = DateTimeHelper.getVisibleDateIndex(
           widget.visibleDates, regionEndTime);
 
-      double startYPosition = CalendarViewHelperV2.getTimeToPosition(
+      double startYPosition = CalendarViewHelper.getTimeToPosition(
           Duration(
               hours: regionStartTime.hour, minutes: regionStartTime.minute),
           widget.timeSlotViewSettings,
@@ -230,7 +230,7 @@ class _TimeSlotWidgetState extends State<TimeSlotWidget> {
         startYPosition = 0;
       }
 
-      double endYPosition = CalendarViewHelperV2.getTimeToPosition(
+      double endYPosition = CalendarViewHelper.getTimeToPosition(
           Duration(hours: regionEndTime.hour, minutes: regionEndTime.minute),
           widget.timeSlotViewSettings,
           minuteHeight);
@@ -573,7 +573,7 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
   DateTime get minDate => _minDate;
 
   set minDate(DateTime value) {
-    if (CalendarViewHelperV2.isSameTimeSlot(_minDate, value)) {
+    if (CalendarViewHelper.isSameTimeSlot(_minDate, value)) {
       return;
     }
 
@@ -586,7 +586,7 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
   DateTime get maxDate => _maxDate;
 
   set maxDate(DateTime value) {
-    if (CalendarViewHelperV2.isSameTimeSlot(_maxDate, value)) {
+    if (CalendarViewHelper.isSameTimeSlot(_maxDate, value)) {
       return;
     }
     _maxDate = value;
@@ -611,7 +611,7 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
   List<CalendarTimeRegion>? get specialRegion => _specialRegion;
 
   set specialRegion(List<CalendarTimeRegion>? value) {
-    if (CalendarViewHelperV2.isCollectionEqual(_specialRegion, value)) {
+    if (CalendarViewHelper.isCollectionEqual(_specialRegion, value)) {
       return;
     }
 
@@ -716,7 +716,7 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
   void _drawDisabledDate(DateTime disabledStartDate, DateTime disabledEndDate,
       Canvas canvas, int visibleDatesCount) {
     final double minuteHeight = timeIntervalHeight /
-        CalendarViewHelperV2.getTimeInterval(timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(timeSlotViewSettings);
     final double viewWidth = width - timeLabelWidth;
     final double cellWidth = viewWidth / visibleDatesCount;
 
@@ -724,12 +724,12 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
         DateTimeHelper.getVisibleDateIndex(visibleDates, disabledStartDate);
     final int endIndex =
         DateTimeHelper.getVisibleDateIndex(visibleDates, disabledEndDate);
-    final double startYPosition = CalendarViewHelperV2.getTimeToPosition(
+    final double startYPosition = CalendarViewHelper.getTimeToPosition(
         Duration(
             hours: disabledStartDate.hour, minutes: disabledStartDate.minute),
         timeSlotViewSettings,
         minuteHeight);
-    final double endYPosition = CalendarViewHelperV2.getTimeToPosition(
+    final double endYPosition = CalendarViewHelper.getTimeToPosition(
         Duration(hours: disabledEndDate.hour, minutes: disabledEndDate.minute),
         timeSlotViewSettings,
         minuteHeight);
@@ -878,7 +878,7 @@ class _TimeSlotRenderObject extends CustomCalendarRenderObject {
     final int hour =
         ((timeSlotViewSettings.startHour - startHour) * 60).toInt();
     final int timeInterval =
-        CalendarViewHelperV2.getTimeInterval(timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(timeSlotViewSettings);
     for (int j = 0; j < visibleDates.length; j++) {
       DateTime date = visibleDates[j];
       for (int i = 0; i < horizontalLinesCount; i++) {

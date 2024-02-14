@@ -95,41 +95,41 @@ class AppointmentHelper {
       return true;
     }
 
-    // switch (view) {
-    // case CalendarView.timelineDay:
-    // case CalendarView.timelineWeek:
-    // case CalendarView.timelineWorkWeek:
-    // case CalendarView.timelineMonth:
-    // case CalendarView.schedule:
-    // break;
-    // case CalendarView.day:
-    // case CalendarView.week:
-    // case CalendarView.workWeek:
-    //   {
-    //     return getDifference(appStartTime, appEndTime).inDays <= 0 &&
-    //         appStartTime.day != appEndTime.day &&
-    //         appEndTime.hour != 0;
-    // }
-    // case CalendarView.month:
-    //   {
-    //     if (showTrailingLeadingDates != null &&
-    //         !showTrailingLeadingDates &&
-    //         (appStartTime.isBefore(visibleStartDate!) ||
-    //             appEndTime.isAfter(visibleEndDate!))) {
-    //       return true;
-    //     }
+    switch (view) {
+      case CalendarView.timelineDay:
+      case CalendarView.timelineWeek:
+      case CalendarView.timelineWorkWeek:
+      case CalendarView.timelineMonth:
+      case CalendarView.schedule:
+        break;
+      case CalendarView.day:
+      case CalendarView.week:
+      case CalendarView.workWeek:
+        {
+          return getDifference(appStartTime, appEndTime).inDays <= 0 &&
+              appStartTime.day != appEndTime.day &&
+              appEndTime.hour != 0;
+        }
+      case CalendarView.month:
+        {
+          if (showTrailingLeadingDates != null &&
+              !showTrailingLeadingDates &&
+              (appStartTime.isBefore(visibleStartDate!) ||
+                  appEndTime.isAfter(visibleEndDate!))) {
+            return true;
+          }
 
-    //     if (appStartTime.isAfter(viewStartDate)) {
-    //       final int appointmentStartWeek =
-    //           getDifference(viewStartDate, appStartTime).inDays ~/
-    //               DateTime.daysPerWeek;
-    //       final int appointmentEndWeek =
-    //           getDifference(viewStartDate, appEndTime).inDays ~/
-    //               DateTime.daysPerWeek;
-    //       return appointmentStartWeek != appointmentEndWeek;
-    //     }
-    //   }
-    // }
+          if (appStartTime.isAfter(viewStartDate)) {
+            final int appointmentStartWeek =
+                getDifference(viewStartDate, appStartTime).inDays ~/
+                    DateTime.daysPerWeek;
+            final int appointmentEndWeek =
+                getDifference(viewStartDate, appEndTime).inDays ~/
+                    DateTime.daysPerWeek;
+            return appointmentStartWeek != appointmentEndWeek;
+          }
+        }
+    }
 
     return false;
   }
@@ -304,7 +304,7 @@ class AppointmentHelper {
         notes: appointment.notes,
         location: appointment.location,
         isSpanned: appointment.isSpanned,
-        resourceIds: CalendarViewHelperV2.cloneList(appointment.resourceIds),
+        resourceIds: CalendarViewHelper.cloneList(appointment.resourceIds),
         recurrenceId: appointment.recurrenceId,
         id: appointment.id);
     copyAppointment.actualStartTime = appointment.actualStartTime;
@@ -521,8 +521,7 @@ class AppointmentHelper {
   static double timeToPosition(
       SfCalendar calendar, DateTime date, double timeIntervalHeight) {
     final double singleIntervalHeightForAnHour = (60 /
-            CalendarViewHelperV2.getTimeInterval(
-                calendar.timeSlotViewSettings)) *
+            CalendarViewHelper.getTimeInterval(calendar.timeSlotViewSettings)) *
         timeIntervalHeight;
 
     final double startHour = calendar.timeSlotViewSettings.startHour;
@@ -539,8 +538,7 @@ class AppointmentHelper {
     }
 
     final double hourHeight = (60 /
-            CalendarViewHelperV2.getTimeInterval(
-                calendar.timeSlotViewSettings)) *
+            CalendarViewHelper.getTimeInterval(calendar.timeSlotViewSettings)) *
         timeIntervalHeight;
     return minimumDuration.inMinutes * (hourHeight / 60);
   }
@@ -615,9 +613,9 @@ class AppointmentHelper {
           isSameDate(currentApp.actualEndTime, appointment.actualStartTime);
     }
 
-    if (CalendarViewHelperV2.isSameTimeSlot(
+    if (CalendarViewHelper.isSameTimeSlot(
             currentAppointmentStartTime, appointmentStartTime) ||
-        CalendarViewHelperV2.isSameTimeSlot(
+        CalendarViewHelper.isSameTimeSlot(
             currentAppointmentEndTime, appointmentEndTime)) {
       return true;
     }
@@ -714,7 +712,7 @@ class AppointmentHelper {
       List<CalendarAppointment> visibleAppointments,
       bool isAllDay,
       [int? resourceIndex]) {
-    final bool isTimeline = CalendarViewHelperV2.isTimelineView(view);
+    final bool isTimeline = CalendarViewHelper.isTimelineView(view);
     final List<CalendarAppointment> normalAppointments = visibleAppointments
         .where((CalendarAppointment app) =>
             _iterateAppointment(app, isTimeline, isAllDay))
@@ -743,17 +741,17 @@ class AppointmentHelper {
     int maxColsCount = 1;
 
     final int timeIntervalMinutes =
-        CalendarViewHelperV2.getTimeInterval(calendar.timeSlotViewSettings);
+        CalendarViewHelper.getTimeInterval(calendar.timeSlotViewSettings);
     for (int count = 0; count < normalAppointments.length; count++) {
       final CalendarAppointment currentAppointment = normalAppointments[count];
-      // if ((view == CalendarView.workWeek ||
-      //         view == CalendarView.timelineWorkWeek) &&
-      //     calendar.timeSlotViewSettings.nonWorkingDays
-      //         .contains(currentAppointment.actualStartTime.weekday) &&
-      //     calendar.timeSlotViewSettings.nonWorkingDays
-      //         .contains(currentAppointment.actualEndTime.weekday)) {
-      //   continue;
-      // }
+      if ((view == CalendarView.workWeek ||
+              view == CalendarView.timelineWorkWeek) &&
+          calendar.timeSlotViewSettings.nonWorkingDays
+              .contains(currentAppointment.actualStartTime.weekday) &&
+          calendar.timeSlotViewSettings.nonWorkingDays
+              .contains(currentAppointment.actualEndTime.weekday)) {
+        continue;
+      }
 
       List<AppointmentView>? intersectingApps;
       final AppointmentView currentAppView = _getAppointmentView(

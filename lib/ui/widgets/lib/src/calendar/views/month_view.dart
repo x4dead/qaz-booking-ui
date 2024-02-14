@@ -140,7 +140,7 @@ class _MonthViewWidgetState extends State<MonthViewWidget> {
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[];
     final double weekNumberPanelWidth =
-        CalendarViewHelperV2.getWeekNumberPanelWidth(
+        CalendarViewHelper.getWeekNumberPanelWidth(
             widget.calendar.showWeekNumber,
             widget.width,
             widget.isMobilePlatform);
@@ -153,7 +153,7 @@ class _MonthViewWidgetState extends State<MonthViewWidget> {
       final int currentMonth =
           widget.visibleDates[visibleDatesCount ~/ 2].month;
       final bool showTrailingLeadingDates =
-          CalendarViewHelperV2.isLeadingAndTrailingDatesVisible(
+          CalendarViewHelper.isLeadingAndTrailingDatesVisible(
               widget.rowCount, widget.showTrailingAndLeadingDates);
       for (int i = 0; i < visibleDatesCount; i++) {
         final DateTime currentVisibleDate = widget.visibleDates[i];
@@ -175,7 +175,7 @@ class _MonthViewWidgetState extends State<MonthViewWidget> {
         if (widget.calendar.dataSource != null &&
             !AppointmentHelper.isCalendarAppointment(
                 widget.calendar.dataSource!)) {
-          monthCellAppointment = CalendarViewHelperV2.getCustomAppointments(
+          monthCellAppointment = CalendarViewHelper.getCustomAppointments(
               appointments, widget.calendar.dataSource);
         }
 
@@ -611,8 +611,8 @@ class _MonthViewRenderObject extends CustomCalendarRenderObject {
 
     final List<DateTime>? oldDates = _blackoutDates;
     _blackoutDates = value;
-    if (CalendarViewHelperV2.isEmptyList(_blackoutDates) &&
-        CalendarViewHelperV2.isEmptyList(oldDates)) {
+    if (CalendarViewHelper.isEmptyList(_blackoutDates) &&
+        CalendarViewHelper.isEmptyList(oldDates)) {
       return;
     }
 
@@ -734,7 +734,7 @@ class _MonthViewRenderObject extends CustomCalendarRenderObject {
       final int visibleDatesCount = visibleDates.length;
       final int currentMonth = visibleDates[visibleDatesCount ~/ 2].month;
       final bool showTrailingLeadingDates =
-          CalendarViewHelperV2.isLeadingAndTrailingDatesVisible(
+          CalendarViewHelper.isLeadingAndTrailingDatesVisible(
               rowCount, showTrailingAndLeadingDates);
       _drawWeekNumberPanel(context.canvas, cellHeight);
       for (int i = 0; i < visibleDatesCount; i++) {
@@ -911,7 +911,7 @@ class _MonthViewRenderObject extends CustomCalendarRenderObject {
                 : Colors.white38);
 
     final bool showTrailingLeadingDates =
-        CalendarViewHelperV2.isLeadingAndTrailingDatesVisible(
+        CalendarViewHelper.isLeadingAndTrailingDatesVisible(
             rowCount, showTrailingAndLeadingDates);
 
     final Color currentMonthBackgroundColor = monthCellStyle.backgroundColor ??
@@ -1190,7 +1190,7 @@ class _MonthViewRenderObject extends CustomCalendarRenderObject {
         top = 0;
     final double cellHeight = size.height / rowCount;
     final bool showTrailingLeadingDates =
-        CalendarViewHelperV2.isLeadingAndTrailingDatesVisible(
+        CalendarViewHelper.isLeadingAndTrailingDatesVisible(
             rowCount, showTrailingAndLeadingDates);
     final int currentMonth = visibleDates[visibleDates.length ~/ 2].month;
     for (int i = 0; i < visibleDates.length; i++) {

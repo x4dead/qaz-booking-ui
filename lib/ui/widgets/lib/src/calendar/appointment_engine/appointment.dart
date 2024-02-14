@@ -71,6 +71,8 @@ class Appointment with Diagnosticable {
   /// An object that contains properties to hold the detailed information
   /// about the data, which will be rendered in [SfCalendar].
   Appointment({
+    this.payment,
+    this.guestFullname,
     this.startTimeZone,
     this.endTimeZone,
     this.recurrenceRule,
@@ -90,6 +92,8 @@ class Appointment with Diagnosticable {
     _appointmentType = _getAppointmentType();
     id = id ?? hashCode;
   }
+  final String? payment;
+  final String? guestFullname;
 
   /// The start time for an [Appointment] in [SfCalendar].
   ///

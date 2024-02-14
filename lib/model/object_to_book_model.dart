@@ -3,6 +3,7 @@
 import 'package:qaz_booking_ui/model/guest_model.dart';
 
 class ObjectToBook {
+  final String? id;
   final String? object;
   final String? objectName;
   final String? objectDescription;
@@ -14,7 +15,8 @@ class ObjectToBook {
   final List<String>? listImages;
   final List<GuestModel>? guests;
 
-  ObjectToBook({
+  const ObjectToBook({
+    this.id,
     this.object,
     this.objectName,
     this.objectDescription,
@@ -28,6 +30,7 @@ class ObjectToBook {
   });
 
   ObjectToBook copyWith({
+    String? id,
     String? object,
     String? objectName,
     String? objectDescription,
@@ -40,6 +43,7 @@ class ObjectToBook {
     List<GuestModel>? guests,
   }) =>
       ObjectToBook(
+        id: id ?? this.id,
         object: object ?? this.object,
         objectName: objectName ?? this.objectName,
         objectDescription: objectDescription ?? this.objectDescription,
