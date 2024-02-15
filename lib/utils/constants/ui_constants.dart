@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
 ///SizedBox const
@@ -20,6 +21,8 @@ const kSBW16 = SizedBox(width: 16);
 const kSBW6 = SizedBox(width: 6);
 const kSBH6 = SizedBox(height: 6);
 const kSBH5 = SizedBox(height: 5);
+const kSBH4 = SizedBox(height: 4);
+const kSBH2 = SizedBox(height: 2);
 const kSBH8 = SizedBox(height: 8);
 const kNothing = SizedBox.shrink();
 
@@ -38,6 +41,12 @@ const Radius buttonRadius = Radius.circular(12);
 
 ///Size
 const kS36 = Size(36, 36);
+
+const bottomBorder = Border(
+    bottom: BorderSide(
+        color: AppColors.colorLightGray,
+        width: 1,
+        strokeAlign: BorderSide.strokeAlignInside));
 
 const List<(String, String)> menuButtons = [
   (AppImages.main, 'Главная'),

@@ -57,10 +57,18 @@ final listAppointment = [
   GuestModel(
     arrivalDate: now.add(const Duration(days: 1)).toIso8601String(),
     resourceId: '0000',
-    departureDate: now.add(const Duration(days: 4)).toIso8601String(),
+    departureDate: now.add(const Duration(days: 1)).toIso8601String(),
     color: AppColors.colorBlue,
     payment: '6 300 ₸',
-    guestFullname: 'Эдуард Б. М. ',
+    guestFullname: 'Эдуард Б. М.',
+  ),
+  GuestModel(
+    arrivalDate: now.add(const Duration(days: 3)).toIso8601String(),
+    resourceId: '0000',
+    departureDate: now.add(const Duration(days: 4)).toIso8601String(),
+    color: AppColors.colorViolet,
+    payment: '6 300 ₸',
+    guestFullname: 'Эдуард Б. М.',
   ),
   GuestModel(
     arrivalDate: now.toIso8601String(),

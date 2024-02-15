@@ -375,9 +375,9 @@ class _MeetingRoomCalendarState extends State<MeetingRoomCalendar> {
     return SfCalendar(
       firstDayOfWeek: 6,
       backgroundColor: AppColors.colorWhite,
-      appointmentBuilder: (context, calendarAppointmentDetails) =>
-          AppointmentView(
-              calendarAppointmentDetails: calendarAppointmentDetails),
+      // appointmentBuilder: (context, calendarAppointmentDetails) =>
+      //     AppointmentViewWidget(
+      //         calendarAppointmentDetails: calendarAppointmentDetails),
       // allowAppointmentResize: true,
       allowViewNavigation: true,
 

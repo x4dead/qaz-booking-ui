@@ -1,12 +1,17 @@
 ﻿import 'dart:async';
+import 'dart:developer';
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
+import 'package:qaz_booking_ui/model/guest_model.dart';
+import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/appointment_view.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/resource_view.dart';
@@ -177,6 +182,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
 
   // Widget _getTimelineViewHeader() {
   //   final now = DateTime.now();
+
   final int visibleDatesCount =
       DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 7, -1, []);
   final currentDate = DateTime(now.year, now.month, now.day);
@@ -417,7 +423,9 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   //     _drag = _scrollController!.position.drag(details, _disposeDrag);
   //   }
   // }
+  int? date;
 
+  int appointmentIndex = 0;
   @override
   Widget build(BuildContext context) {
     _currentViewVisibleDates =
@@ -494,60 +502,148 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                   return false;
                                 },
                                 child: SizedBox(
-                                  height: listResources.length * 92,
+                                  height: (listResources.length * 92) + 82,
                                   width: _currentViewVisibleDates.length * 52,
                                   child: CustomScrollView(
                                       controller: _mycontroller1,
                                       slivers: [
                                         SliverList(
-                                            delegate: SliverChildListDelegate([
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: List.generate(
-                                              listResources.length,
-                                              (index) => Container(
-                                                height: 92,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
+                                            delegate: SliverChildListDelegate(
+                                          [
+                                            Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: List.generate(
+                                                listResources.length,
+                                                (columnindex) {
+                                                  appointmentIndex = 0;
+                                                  List<GuestModel>
+                                                      currentResourceApointments =
+                                                      [];
+                                                  ObjectToBook? resource =
+                                                      listResources[
+                                                          columnindex];
+                                                  // print(
+                                                  //     'RESOURCE ID: ${resource.id}');
+
+                                                  currentResourceApointments
+                                                      .addAll(listAppointment
+                                                          .where((a) =>
+                                                              a.resourceId ==
+                                                              resource.id));
+
+                                                  currentResourceApointments
+                                                      .sort((a, b) => a
+                                                          .arrivalDate!
+                                                          .compareTo(
+                                                              b.arrivalDate!));
+                                                  return Container(
+                                                    height: 92,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
                                                         horizontal: 3),
-                                                decoration: const BoxDecoration(
-                                                    color: AppColors.colorWhite,
-                                                    border: bottomBorder),
-                                                child: Row(
-                                                    children: List.generate(
-                                                        math.max(
-                                                            0,
-                                                            _currentViewVisibleDates
-                                                                        .length *
-                                                                    2 -
-                                                                1), (index) {
-                                                  if (index.isEven) {
-                                                    final int itemIndex =
-                                                        index ~/ 2;
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            color: AppColors
+                                                                .colorWhite,
+                                                            border:
+                                                                bottomBorder),
+                                                    child: Row(
+                                                        children: List.generate(
+                                                            math.max(
+                                                                0,
+                                                                _currentViewVisibleDates
+                                                                            .length *
+                                                                        2 -
+                                                                    1),
+                                                            (index) {
+                                                      if (index.isEven) {
+                                                        final int itemIndex =
+                                                            index ~/ 2;
 
-                                                    final visibleDate =
-                                                        _currentViewVisibleDates[
-                                                            itemIndex];
+                                                        final visibleDate =
+                                                            _currentViewVisibleDates[
+                                                                itemIndex];
 
-                                                    return DateView(
-                                                      bgColor: AppColors
-                                                          .colorLightGray,
-                                                      day: visibleDate.day
-                                                          .toString(),
-                                                      textColor:
-                                                          AppColors.colorGray,
-                                                      weekDay: shortWeekDays[
-                                                          visibleDate.weekday -
-                                                              1],
-                                                    );
-                                                  }
-                                                  return kSBW6;
-                                                })),
+                                                        if (currentResourceApointments !=
+                                                                [] &&
+                                                            appointmentIndex <
+                                                                currentResourceApointments
+                                                                    .length) {
+                                                          date = DateTime.parse(
+                                                                  currentResourceApointments[
+                                                                          appointmentIndex]
+                                                                      .arrivalDate!)
+                                                              .day;
+                                                          if (date ==
+                                                                  visibleDate
+                                                                      .day &&
+                                                              currentResourceApointments
+                                                                          .length -
+                                                                      1 >
+                                                                  appointmentIndex) {
+                                                            appointmentIndex++;
+                                                          }
+                                                        }
+
+                                                        return
+                                                            // visibleDate
+                                                            //                 .day ==
+                                                            //             date &&
+                                                            //         currentResourceApointments !=
+                                                            //             []
+                                                            //     ? SizedBox(
+                                                            //         width: 46,
+                                                            //         // + 6 + 46,
+                                                            //         child: AppointmentViewWidget(
+                                                            //             appointment:
+                                                            //                 currentResourceApointments[
+                                                            //                     appointmentIndex]),
+                                                            //       )
+                                                            //     :
+                                                            Stack(
+                                                          children: [
+                                                            currentResourceApointments ==
+                                                                        [] ||
+                                                                    currentResourceApointments
+                                                                            .isEmpty &&
+                                                                        visibleDate.day !=
+                                                                            date
+                                                                ? DateView(
+                                                                    bgColor:
+                                                                        AppColors
+                                                                            .colorLightGray,
+                                                                    day: visibleDate
+                                                                        .day
+                                                                        .toString(),
+                                                                    textColor:
+                                                                        AppColors
+                                                                            .colorGray,
+                                                                    weekDay: shortWeekDays[
+                                                                        visibleDate.weekday -
+                                                                            1],
+                                                                  )
+                                                                : SizedBox(
+                                                                    width: 46,
+                                                                    // + 6 + 46,
+                                                                    child:
+                                                                        AppointmentViewWidget(
+                                                                      appointment:
+                                                                          currentResourceApointments[
+                                                                              appointmentIndex],
+                                                                    ),
+                                                                  ),
+                                                          ],
+                                                        );
+                                                      }
+                                                      return kSBW6;
+                                                    })),
+                                                  );
+                                                },
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 82)
-                                        ]))
+                                            const SizedBox(height: 82)
+                                          ],
+                                        ))
                                       ]),
                                 ),
                               ),
