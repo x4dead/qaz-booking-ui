@@ -584,56 +584,34 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                             appointmentIndex++;
                                                           }
                                                         }
-
-                                                        return
-                                                            // visibleDate
-                                                            //                 .day ==
-                                                            //             date &&
-                                                            //         currentResourceApointments !=
-                                                            //             []
-                                                            //     ? SizedBox(
-                                                            //         width: 46,
-                                                            //         // + 6 + 46,
-                                                            //         child: AppointmentViewWidget(
-                                                            //             appointment:
-                                                            //                 currentResourceApointments[
-                                                            //                     appointmentIndex]),
-                                                            //       )
-                                                            //     :
-                                                            Stack(
-                                                          children: [
-                                                            currentResourceApointments ==
-                                                                        [] ||
-                                                                    currentResourceApointments
-                                                                            .isEmpty &&
-                                                                        visibleDate.day !=
-                                                                            date
-                                                                ? DateView(
-                                                                    bgColor:
-                                                                        AppColors
-                                                                            .colorLightGray,
-                                                                    day: visibleDate
-                                                                        .day
-                                                                        .toString(),
-                                                                    textColor:
-                                                                        AppColors
-                                                                            .colorGray,
-                                                                    weekDay: shortWeekDays[
-                                                                        visibleDate.weekday -
-                                                                            1],
-                                                                  )
-                                                                : SizedBox(
-                                                                    width: 46,
-                                                                    // + 6 + 46,
-                                                                    child:
-                                                                        AppointmentViewWidget(
-                                                                      appointment:
-                                                                          currentResourceApointments[
-                                                                              appointmentIndex],
-                                                                    ),
-                                                                  ),
-                                                          ],
-                                                        );
+                                                        if (currentResourceApointments
+                                                                .isEmpty ||
+                                                            visibleDate.day !=
+                                                                date) {
+                                                          return DateView(
+                                                            bgColor: AppColors
+                                                                .colorLightGray,
+                                                            day: visibleDate.day
+                                                                .toString(),
+                                                            textColor: AppColors
+                                                                .colorGray,
+                                                            weekDay: shortWeekDays[
+                                                                visibleDate
+                                                                        .weekday -
+                                                                    1],
+                                                          );
+                                                        } else {
+                                                          return SizedBox(
+                                                            width: 46,
+                                                            // + 6 + 46,
+                                                            child:
+                                                                AppointmentViewWidget(
+                                                              appointment:
+                                                                  currentResourceApointments[
+                                                                      appointmentIndex],
+                                                            ),
+                                                          );
+                                                        }
                                                       }
                                                       return kSBW6;
                                                     })),
