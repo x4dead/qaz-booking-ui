@@ -2,9 +2,9 @@
 import 'dart:ui';
 
 class GuestModel {
-  final String? arrivalDate;
+  final DateTime? arrivalDate;
   final String? arrivalTime;
-  final String? departureDate;
+  final DateTime? departureDate;
   final String? departureTime;
   final String? bookingStatus;
   final String? objectName;
@@ -41,9 +41,9 @@ class GuestModel {
   });
 
   GuestModel copyWith({
-    String? arrivalDate,
+    DateTime? arrivalDate,
     String? arrivalTime,
-    String? departureDate,
+    DateTime? departureDate,
     String? departureTime,
     String? bookingStatus,
     String? objectName,

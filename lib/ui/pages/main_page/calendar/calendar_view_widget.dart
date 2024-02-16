@@ -423,7 +423,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   //     _drag = _scrollController!.position.drag(details, _disposeDrag);
   //   }
   // }
-  int? date;
+  DateTime? arrivalDate;
 
   int appointmentIndex = 0;
   @override
@@ -563,55 +563,118 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         final visibleDate =
                                                             _currentViewVisibleDates[
                                                                 itemIndex];
+                                                        // final nextVisDate =
+                                                        //     _currentViewVisibleDates[
+                                                        //         itemIndex ==
+                                                        //                 _currentViewVisibleDates.length -
+                                                        //                     1
+                                                        //             ? itemIndex
+                                                        //             : itemIndex +
+                                                        //                 1];
+                                                        // final prevVisDate =
+                                                        //     _currentViewVisibleDates[
+                                                        //         itemIndex == 0
+                                                        //             ? itemIndex
+                                                        //             : itemIndex -
+                                                        //                 1];
 
-                                                        if (currentResourceApointments !=
-                                                                [] &&
+                                                        bool? _isSameDate;
+                                                        if (currentResourceApointments
+                                                                .isNotEmpty &&
                                                             appointmentIndex <
                                                                 currentResourceApointments
                                                                     .length) {
-                                                          date = DateTime.parse(
-                                                                  currentResourceApointments[
-                                                                          appointmentIndex]
-                                                                      .arrivalDate!)
-                                                              .day;
-                                                          if (date ==
+                                                          arrivalDate =
+                                                              currentResourceApointments[
+                                                                      appointmentIndex]
+                                                                  .arrivalDate!;
+                                                          _isSameDate = arrivalDate
+                                                                      ?.day ==
                                                                   visibleDate
                                                                       .day &&
-                                                              currentResourceApointments
-                                                                          .length -
-                                                                      1 >
-                                                                  appointmentIndex) {
+                                                              arrivalDate
+                                                                      ?.month ==
+                                                                  visibleDate
+                                                                      .month &&
+                                                              arrivalDate
+                                                                      ?.year ==
+                                                                  visibleDate
+                                                                      .year;
+
+                                                          if (_isSameDate ==
+                                                                  true &&
+                                                              appointmentIndex <
+                                                                  currentResourceApointments
+                                                                      .length) {
                                                             appointmentIndex++;
                                                           }
                                                         }
-                                                        if (currentResourceApointments
-                                                                .isEmpty ||
-                                                            visibleDate.day !=
-                                                                date) {
-                                                          return DateView(
-                                                            bgColor: AppColors
-                                                                .colorLightGray,
-                                                            day: visibleDate.day
-                                                                .toString(),
-                                                            textColor: AppColors
-                                                                .colorGray,
-                                                            weekDay: shortWeekDays[
-                                                                visibleDate
-                                                                        .weekday -
-                                                                    1],
-                                                          );
-                                                        } else {
-                                                          return SizedBox(
-                                                            width: 46,
-                                                            // + 6 + 46,
-                                                            child:
-                                                                AppointmentViewWidget(
-                                                              appointment:
-                                                                  currentResourceApointments[
-                                                                      appointmentIndex],
-                                                            ),
-                                                          );
+                                                        final isAppointment =
+                                                            _isSameDate ==
+                                                                    true &&
+                                                                currentResourceApointments
+                                                                    .isNotEmpty;
+                                                        int daysBetween(
+                                                            DateTime from,
+                                                            DateTime to) {
+                                                          return (from
+                                                              .difference(to)
+                                                              .inDays);
                                                         }
+
+                                                        final departureArrivalDateDiff = currentResourceApointments
+                                                                .isEmpty
+                                                            ? 0
+                                                            : daysBetween(
+                                                                currentResourceApointments[appointmentIndex ==
+                                                                            0
+                                                                        ? appointmentIndex
+                                                                        : appointmentIndex -
+                                                                            1]
+                                                                    .departureDate!,
+                                                                arrivalDate!);
+                                                        return Stack(
+                                                          clipBehavior:
+                                                              Clip.none,
+                                                          children: [
+                                                            Positioned(
+                                                              child: DateView(
+                                                                bgColor: AppColors
+                                                                    .colorLightGray,
+                                                                day: visibleDate
+                                                                    .day
+                                                                    .toString(),
+                                                                textColor:
+                                                                    AppColors
+                                                                        .colorGray,
+                                                                weekDay: shortWeekDays[
+                                                                    visibleDate
+                                                                            .weekday -
+                                                                        1],
+                                                              ),
+                                                            ),
+                                                            if (isAppointment)
+                                                              Positioned(
+                                                                left: 0,
+                                                                width: departureArrivalDateDiff *
+                                                                        46 +
+                                                                    (departureArrivalDateDiff !=
+                                                                            1
+                                                                        ? departureArrivalDateDiff -
+                                                                            1 * 6
+                                                                        : 0),
+                                                                child:
+                                                                    AppointmentViewWidget(
+                                                                  appointment: currentResourceApointments[
+                                                                      appointmentIndex ==
+                                                                              0
+                                                                          ? appointmentIndex
+                                                                          : appointmentIndex -
+                                                                              1],
+                                                                ),
+                                                              )
+                                                          ],
+                                                        );
                                                       }
                                                       return kSBW6;
                                                     })),
