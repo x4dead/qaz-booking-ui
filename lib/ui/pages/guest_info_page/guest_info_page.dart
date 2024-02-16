@@ -36,10 +36,10 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
   final prepayment = TextEditingController();
   final payment = TextEditingController();
   final comment = TextEditingController();
-  final arrivalDate = TextEditingController();
-  final arrivalTime = TextEditingController();
-  final departureDate = TextEditingController();
-  final departureTime = TextEditingController();
+  final startDate = TextEditingController();
+  final startTime = TextEditingController();
+  final endDate = TextEditingController();
+  final endTime = TextEditingController();
 
   @override
   void dispose() {
@@ -54,10 +54,10 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
     prepayment.dispose();
     payment.dispose();
     comment.dispose();
-    arrivalDate.dispose();
-    arrivalTime.dispose();
-    departureDate.dispose();
-    departureTime.dispose();
+    startDate.dispose();
+    startTime.dispose();
+    endDate.dispose();
+    endTime.dispose();
   }
 
   ValueNotifier<List<String>> listImgs = ValueNotifier(['', '', '']);
@@ -71,9 +71,9 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
     listImgs.value[index] = url;
   }
 
-  DateTime? initArrivalSelectedDate;
+  DateTime? initStartSelectedDate;
 
-  DateTime? initDepartureSelectedDate;
+  DateTime? initEndSelectedDate;
   _showCalendarDialog(BuildContext ctx,
       {required DateTime firstDate,
       required DateTime initialDate,
@@ -111,8 +111,8 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
           kSBW12,
           SvgPicture.asset(
             svg,
-              colorFilter: const ColorFilter.mode(
-                AppColors.colorGray, BlendMode.srcIn),
+            colorFilter:
+                const ColorFilter.mode(AppColors.colorGray, BlendMode.srcIn),
           ),
           kSBW20,
         ],
@@ -126,9 +126,8 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
         action: (
           SvgPicture.asset(
             AppImages.save,
-              colorFilter: const ColorFilter.mode(
-                AppColors.colorBlack, BlendMode.srcIn),
-
+            colorFilter:
+                const ColorFilter.mode(AppColors.colorBlack, BlendMode.srcIn),
           ),
           () {},
         ),
@@ -144,24 +143,24 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                   _showCalendarDialog(
                     context,
                     firstDate: DateTime(1900),
-                    initialDate: initArrivalSelectedDate ?? DateTime.now(),
+                    initialDate: initStartSelectedDate ?? DateTime.now(),
                     lastDate: DateTime(DateTime.now().year + 10),
                     onDateChanged: (value) {
-                      arrivalDate.text = DateFormat("dd.MM.y").format(value);
-                      initArrivalSelectedDate = value;
+                      startDate.text = DateFormat("dd.MM.y").format(value);
+                      initStartSelectedDate = value;
                     },
                   );
                 },
                 readOnly: true,
                 suffix: getSuffix(AppImages.calendar),
-                controller: arrivalDate,
+                controller: startDate,
                 floatingLabelText: 'Дата заезда',
                 hintText: '01.01.0001',
               ),
               kSBH25,
               FloatingLabelTextField(
                 suffix: getSuffix(AppImages.time),
-                controller: arrivalTime,
+                controller: startTime,
                 floatingLabelText: 'Время заезда',
                 hintText: '00:00',
               ),
@@ -171,24 +170,24 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                   _showCalendarDialog(
                     context,
                     firstDate: DateTime(1900),
-                    initialDate: initDepartureSelectedDate ?? DateTime.now(),
+                    initialDate: initEndSelectedDate ?? DateTime.now(),
                     lastDate: DateTime(DateTime.now().year + 10),
                     onDateChanged: (value) {
-                      departureDate.text = DateFormat("dd.MM.y").format(value);
-                      initDepartureSelectedDate = value;
+                      endDate.text = DateFormat("dd.MM.y").format(value);
+                      initEndSelectedDate = value;
                     },
                   );
                 },
                 readOnly: true,
                 suffix: getSuffix(AppImages.calendar),
-                controller: departureDate,
+                controller: endDate,
                 floatingLabelText: 'Дата выезда',
                 hintText: '01.01.0001',
               ),
               kSBH25,
               FloatingLabelTextField(
                 suffix: getSuffix(AppImages.time),
-                controller: departureTime,
+                controller: endTime,
                 floatingLabelText: 'Время выезда',
                 hintText: '00:00',
               ),

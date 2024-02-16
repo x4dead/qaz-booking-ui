@@ -2,10 +2,10 @@
 import 'dart:ui';
 
 class GuestModel {
-  final DateTime? arrivalDate;
-  final String? arrivalTime;
-  final DateTime? departureDate;
-  final String? departureTime;
+  final DateTime? startDate;
+  final String? startTime;
+  final DateTime? endDate;
+  final String? endTime;
   final String? bookingStatus;
   final String? objectName;
   final int? adultsCount;
@@ -22,10 +22,10 @@ class GuestModel {
 
   const GuestModel({
     this.resourceId,
-    this.arrivalDate,
-    this.arrivalTime,
-    this.departureDate,
-    this.departureTime,
+    this.startDate,
+    this.startTime,
+    this.endDate,
+    this.endTime,
     this.bookingStatus,
     this.objectName,
     this.adultsCount,
@@ -41,10 +41,10 @@ class GuestModel {
   });
 
   GuestModel copyWith({
-    DateTime? arrivalDate,
-    String? arrivalTime,
-    DateTime? departureDate,
-    String? departureTime,
+    DateTime? startDate,
+    String? startTime,
+    DateTime? endDate,
+    String? endTime,
     String? bookingStatus,
     String? objectName,
     int? adultsCount,
@@ -59,10 +59,10 @@ class GuestModel {
     String? comment,
   }) =>
       GuestModel(
-        arrivalDate: arrivalDate ?? this.arrivalDate,
-        arrivalTime: arrivalTime ?? this.arrivalTime,
-        departureDate: departureDate ?? this.departureDate,
-        departureTime: departureTime ?? this.departureTime,
+        startDate: startDate ?? this.startDate,
+        startTime: startTime ?? this.startTime,
+        endDate: endDate ?? this.endDate,
+        endTime: endTime ?? this.endTime,
         bookingStatus: bookingStatus ?? this.bookingStatus,
         objectName: objectName ?? this.objectName,
         adultsCount: adultsCount ?? this.adultsCount,
@@ -76,51 +76,4 @@ class GuestModel {
         color: color ?? this.color,
         comment: comment ?? this.comment,
       );
-
-  factory GuestModel.fromJson(String str) =>
-      GuestModel.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory GuestModel.fromMap(Map<String, dynamic> json) => GuestModel(
-        arrivalDate: json["arrival_date"],
-        arrivalTime: json["arrival_time"],
-        departureDate: json["departure_date"],
-        departureTime: json["departure_time"],
-        bookingStatus: json["booking_status"],
-        objectName: json["object_name"],
-        adultsCount: json["adults_count"],
-        childrenCount: json["children_count"],
-        guestFullname: json["guest_fullname"],
-        phoneNumber: json["phone_number"],
-        paymentMethod: json["payment_method"],
-        prepayment: json["prepayment"],
-        payment: json["payment"],
-        photosOfDocuments: json["photos_of_documents"] == null
-            ? []
-            : List<String>.from(json["photos_of_documents"]!.map((x) => x)),
-        color: json["color"],
-        comment: json["comment"],
-      );
-
-  Map<String, dynamic> toMap() => {
-        "arrival_date": arrivalDate,
-        "arrival_time": arrivalTime,
-        "departure_date": departureDate,
-        "departure_time": departureTime,
-        "booking_status": bookingStatus,
-        "object_name": objectName,
-        "adults_count": adultsCount,
-        "children_count": childrenCount,
-        "guest_fullname": guestFullname,
-        "phone_number": phoneNumber,
-        "payment_method": paymentMethod,
-        "prepayment": prepayment,
-        "payment": payment,
-        "photos_of_documents": photosOfDocuments == null
-            ? []
-            : List<dynamic>.from(photosOfDocuments!.map((x) => x)),
-        "color": color,
-        "comment": comment,
-      };
 }

@@ -423,7 +423,10 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   //     _drag = _scrollController!.position.drag(details, _disposeDrag);
   //   }
   // }
-  DateTime? arrivalDate;
+  DateTime? startDate;
+  DateTime? previusDate;
+  bool isTail = false;
+  List<DateTime> startEndDiffDates = [];
 
   int appointmentIndex = 0;
   @override
@@ -533,9 +536,9 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
 
                                                   currentResourceApointments
                                                       .sort((a, b) => a
-                                                          .arrivalDate!
+                                                          .startDate!
                                                           .compareTo(
-                                                              b.arrivalDate!));
+                                                              b.startDate!));
                                                   return Container(
                                                     height: 92,
                                                     padding: const EdgeInsets
@@ -563,14 +566,14 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         final visibleDate =
                                                             _currentViewVisibleDates[
                                                                 itemIndex];
-                                                        // final nextVisDate =
-                                                        //     _currentViewVisibleDates[
-                                                        //         itemIndex ==
-                                                        //                 _currentViewVisibleDates.length -
-                                                        //                     1
-                                                        //             ? itemIndex
-                                                        //             : itemIndex +
-                                                        //                 1];
+                                                        final nextVisDate =
+                                                            _currentViewVisibleDates[
+                                                                itemIndex ==
+                                                                        _currentViewVisibleDates.length -
+                                                                            1
+                                                                    ? itemIndex
+                                                                    : itemIndex +
+                                                                        1];
                                                         // final prevVisDate =
                                                         //     _currentViewVisibleDates[
                                                         //         itemIndex == 0
@@ -578,67 +581,190 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         //             : itemIndex -
                                                         //                 1];
 
-                                                        bool? _isSameDate;
+                                                        ///true ЕСЛИ ДАТЫ ЗАЕЗДА ГОСТЯ И ДАТА НА ЗАДНЕМ ФОНЕ РАВНЫ
+                                                        bool?
+                                                            isSameStartVisibleDate;
                                                         if (currentResourceApointments
                                                                 .isNotEmpty &&
                                                             appointmentIndex <
                                                                 currentResourceApointments
                                                                     .length) {
-                                                          arrivalDate =
+                                                          startDate =
                                                               currentResourceApointments[
                                                                       appointmentIndex]
-                                                                  .arrivalDate!;
-                                                          _isSameDate = arrivalDate
-                                                                      ?.day ==
-                                                                  visibleDate
-                                                                      .day &&
-                                                              arrivalDate
-                                                                      ?.month ==
-                                                                  visibleDate
-                                                                      .month &&
-                                                              arrivalDate
-                                                                      ?.year ==
-                                                                  visibleDate
-                                                                      .year;
+                                                                  .startDate!;
+                                                          isSameStartVisibleDate =
+                                                              isSameDate(
+                                                                  startDate,
+                                                                  visibleDate);
 
-                                                          if (_isSameDate ==
+                                                          if (isSameStartVisibleDate ==
                                                                   true &&
                                                               appointmentIndex <
                                                                   currentResourceApointments
                                                                       .length) {
+                                                            previusDate =
+                                                                visibleDate;
                                                             appointmentIndex++;
                                                           }
                                                         }
                                                         final isAppointment =
-                                                            _isSameDate ==
+                                                            isSameStartVisibleDate ==
                                                                     true &&
                                                                 currentResourceApointments
                                                                     .isNotEmpty;
                                                         int daysBetween(
                                                             DateTime from,
                                                             DateTime to) {
-                                                          return (from
-                                                              .difference(to)
+                                                          // from = DateTime(
+                                                          //     from.year,
+                                                          //     from.month,
+                                                          //     from.day);
+                                                          // to = DateTime(to.year,
+                                                          //     to.month, to.day);
+                                                          final date = (to
+                                                              .difference(from)
                                                               .inDays);
+                                                          return date;
+                                                        }
+                                                        // int daysBetween(
+                                                        //     DateTime from,
+                                                        //     DateTime to) {
+                                                        //   return (from
+                                                        //       .difference(to)
+                                                        //       .inDays);
+                                                        // }
+
+                                                        List<DateTime>
+                                                            getDaysInBeteween(
+                                                                DateTime
+                                                                    startDate,
+                                                                DateTime
+                                                                    endDate) {
+                                                          List<DateTime> days =
+                                                              [];
+                                                          // startDate = DateTime(
+                                                          //     startDate.year,
+                                                          //     startDate.month,
+                                                          //     startDate.day);
+                                                          // endDate = DateTime(
+                                                          //     endDate.year,
+                                                          //     endDate.month,
+                                                          //     endDate.day);
+                                                          for (int i = 0;
+                                                              i <
+                                                                  daysBetween(
+                                                                    startDate,
+                                                                    endDate,
+                                                                  );
+                                                              i++) {
+                                                            days.add(DateTime(
+                                                                startDate.year,
+                                                                startDate.month,
+                                                                // In Dart you can set more than. 30 days, DateTime will do the trick
+                                                                startDate.day +
+                                                                    i));
+                                                          }
+                                                          return days;
                                                         }
 
-                                                        final departureArrivalDateDiff = currentResourceApointments
+                                                        ///ИНДЕКС ДЛЯ ОТОБРАЖЕНИЯ КАРТОЧЕК ЗАПИСИ С ВЫЧИТАНИЕМ 1 ЭЛЕМЕНТА ДЛЯ КОРРЕКТНОГО ОТБРАЖЕНИЯ
+                                                        final reducedAppointmentIndex =
+                                                            appointmentIndex ==
+                                                                    0
+                                                                ? appointmentIndex
+                                                                : appointmentIndex -
+                                                                    1;
+
+                                                        ///РАЗНИЦА В ДНЯХ МЕЖДУ ДАТОЙ ЗАЕЗДА И ВЫЕЗДА
+                                                        // final endStartDateDiff =
+                                                        //     currentResourceApointments
+                                                        //             .isEmpty
+                                                        //         ? 0
+                                                        //         : getDaysInBeteween(
+                                                        //             startDate!,
+                                                        //             currentResourceApointments[
+                                                        //                     reducedAppointmentIndex]
+                                                        //                 .endDate!,
+                                                        //           ).length;
+                                                        // bool
+                                                        //     isAppointmentTail() {
+                                                        // int i = 0;
+
+                                                        // for (int i = 0;
+                                                        //     i > departureArrivalDateDiff;
+                                                        //     i++) {
+                                                        //   if (departureArrivalDateDiff
+                                                        //               .isNegative ==
+                                                        //           false &&
+                                                        //       departureArrivalDateDiff !=
+                                                        //           0) {
+                                                        //     _isAppointmentTail =
+                                                        //         _currentViewVisibleDates[
+                                                        //                 appointmentIndex +
+                                                        //                     i] ==
+                                                        //             visibleDate;
+                                                        //   }
+                                                        // }
+                                                        startEndDiffDates = currentResourceApointments
                                                                 .isEmpty
-                                                            ? 0
-                                                            : daysBetween(
-                                                                currentResourceApointments[appointmentIndex ==
-                                                                            0
-                                                                        ? appointmentIndex
-                                                                        : appointmentIndex -
-                                                                            1]
-                                                                    .departureDate!,
-                                                                arrivalDate!);
+                                                            ? []
+
+                                                            // : getDaysInBeteween(
+                                                            //           // startDateTime:
+                                                            //           startDate!,
+                                                            //           // endDateTime:
+                                                            //           currentResourceApointments[reducedAppointmentIndex]
+                                                            //               .endDate!,
+                                                            //         ).length ==
+                                                            //         1
+                                                            //     ? []
+
+                                                            : getDaysInBeteween(
+                                                                // startDateTime:
+                                                                startDate!,
+                                                                // endDateTime:
+                                                                currentResourceApointments[
+                                                                        reducedAppointmentIndex]
+                                                                    .endDate!,
+                                                              );
+
+                                                        isTail = startEndDiffDates
+                                                            .any((e) =>
+                                                                isSameDate(e,
+                                                                    visibleDate));
+                                                        //  isSameDate(
+                                                        //       _currentViewVisibleDates[
+                                                        //           itemIndex +
+                                                        //               i],
+                                                        //       visibleDate
+                                                        //       // currentResourceApointments[appointmentIndex].
+                                                        //       );
+                                                        // }
+//
+                                                        // if (isTail == true &&
+                                                        //     i < endStartDateDiff) {
+                                                        //   i++;
+                                                        // }
+                                                        // }
+
+                                                        // return isTail;
+                                                        // }
+                                                        ///
+                                                        ///TODO: Сделал правильное отображение карточки записи гостя,
+                                                        ///завтра надо убрать лишнее, сделать кодревью и добавить комментарии
+                                                        ///и перейти к 2 заданию
+
                                                         return Stack(
                                                           clipBehavior:
                                                               Clip.none,
                                                           children: [
-                                                            Positioned(
-                                                              child: DateView(
+                                                            if (isTail == true)
+                                                              const SizedBox(
+                                                                  height: 46,
+                                                                  width: 46)
+                                                            else
+                                                              DateView(
                                                                 bgColor: AppColors
                                                                     .colorLightGray,
                                                                 day: visibleDate
@@ -652,25 +778,27 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                             .weekday -
                                                                         1],
                                                               ),
-                                                            ),
                                                             if (isAppointment)
                                                               Positioned(
                                                                 left: 0,
-                                                                width: departureArrivalDateDiff *
+
+                                                                ///ВЫСТАВЛЯЕМ ШИРИНУ КАРТОЧКИ
+                                                                ///УМНОЖАЕМ 46 НА КОЛИЧЕСТВО ДНЕЙ МЕЖДУ ДАТОЙ ЗАЕЗДА И ВЫЕЗДА
+                                                                ///ДОБАВЛЯЕМ К ПОЛУЧЕННОМУ ОТСТУПЫ МЕЖДУ КАРТОЧКАМИ
+                                                                width: startEndDiffDates
+                                                                            .length *
                                                                         46 +
-                                                                    (departureArrivalDateDiff !=
+                                                                    (startEndDiffDates.length !=
                                                                             1
-                                                                        ? departureArrivalDateDiff -
-                                                                            1 * 6
+                                                                        ? (startEndDiffDates.length -
+                                                                                1) *
+                                                                            6
                                                                         : 0),
                                                                 child:
                                                                     AppointmentViewWidget(
-                                                                  appointment: currentResourceApointments[
-                                                                      appointmentIndex ==
-                                                                              0
-                                                                          ? appointmentIndex
-                                                                          : appointmentIndex -
-                                                                              1],
+                                                                  appointment:
+                                                                      currentResourceApointments[
+                                                                          reducedAppointmentIndex],
                                                                 ),
                                                               )
                                                           ],
