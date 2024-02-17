@@ -511,7 +511,9 @@ class _MainPageState extends State<MainPage> {
           SvgPicture.asset(AppImages.menu),
           () => globalKey.currentState?.openDrawer(),
         )),
-        body: CalendarViewWidget());
+        body:
+            //  MeetingRoomCalendar(),
+            CalendarViewWidget());
     // Row(
     //     mainAxisSize: MainAxisSize.min,
     //     crossAxisAlignment: CrossAxisAlignment.start,

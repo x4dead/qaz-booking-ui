@@ -51,9 +51,13 @@ class CalendarViewWidget extends StatefulWidget {
 }
 
 class _CalendarViewWidgetState extends State<CalendarViewWidget> {
-  ScrollController _mycontroller1 =
-      ScrollController(); // make seperate controllers
-  ScrollController _mycontroller2 = ScrollController(); // for each scrollables
+  ///Контроллер для скролла карточек записи гостей по вертикали
+  ScrollController appointmentsVertController = ScrollController();
+
+  ///Контроллер для скролла карточек объектов для бронирования по вертикали
+  ScrollController resourcesVertController = ScrollController();
+
+  ///Контроллер синхронного скролла
   SyncScrollController? _syncScroller;
   // ScrollController? _scrollController;
   // ScrollController? _timelineViewHeaderScrollController,
@@ -68,16 +72,34 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   // Offset? _dragDifferenceOffset;
   // Timer? _timer;
 
-  late List<DateTime>
-      // _visibleDates,
-      //     _previousViewVisibleDates,
-      //     _nextViewVisibleDates,
+  late List<DateTime> _visibleDates,
+      _previousViewVisibleDates,
+      _nextViewVisibleDates,
       _currentViewVisibleDates;
+  final int visibleDatesCount =
+      DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 6, -1, []);
+  DateTime previousMonth = DateTime(now.year, now.month - 1);
+  DateTime nextMonth = DateTime(now.year, now.month + 1);
+  DateTime currentMonth = DateTime(now.year, now.month);
 
   @override
   void initState() {
     super.initState();
-    _syncScroller = SyncScrollController([_mycontroller1, _mycontroller2]);
+    _syncScroller = SyncScrollController(
+        [appointmentsVertController, resourcesVertController]);
+
+    _previousViewVisibleDates = DateTimeHelper.getMonthDates(
+        year: previousMonth.year, month: previousMonth.month);
+    _currentViewVisibleDates = DateTimeHelper.getMonthDates(
+        year: currentMonth.year, month: currentMonth.month);
+
+    _nextViewVisibleDates = DateTimeHelper.getMonthDates(
+        year: nextMonth.year, month: nextMonth.month);
+    _visibleDates = [
+      ..._previousViewVisibleDates,
+      ..._currentViewVisibleDates,
+      ..._nextViewVisibleDates
+    ];
 
     // _dragDetails = ValueNotifier<_DragPaintDetails>(
     //     _DragPaintDetails(position: ValueNotifier<Offset?>(null)));
@@ -172,8 +194,8 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
     //   _timelineRulerController = null;
     // }
 
-    _mycontroller1.dispose();
-    _mycontroller2.dispose();
+    appointmentsVertController.dispose();
+    resourcesVertController.dispose();
     _syncScroller?._registeredScrollControllers.every((e) {
       e.dispose();
       return false;
@@ -183,17 +205,14 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   // Widget _getTimelineViewHeader() {
   //   final now = DateTime.now();
 
-  final int visibleDatesCount =
-      DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 7, -1, []);
-  final currentDate = DateTime(now.year, now.month, now.day);
-  //   final DateTime prevDate = DateTimeHelper.getPreviousViewStartDate(
-  //       CalendarView.timelineMonth, 6, currentDate, visibleDatesCount, []);
+  // final DateTime prevDate = DateTimeHelper.getPreviousViewStartDate(
+  // CalendarView.timelineMonth, 6, currentDate, visibleDatesCount, []);
   //   final DateTime nextDate = DateTimeHelper.getNextViewStartDate(
   //       CalendarView.timelineMonth, 6, currentDate, visibleDatesCount, []);
   //   _visibleDates =
   //       getVisibleDates(currentDate, [], 6, visibleDatesCount).cast();
-  //   _previousViewVisibleDates =
-  //       getVisibleDates(prevDate, [], 6, visibleDatesCount).cast();
+  // _previousViewVisibleDates =
+  //     getVisibleDates(prevDate, [], 6, visibleDatesCount).cast();
   //   _nextViewVisibleDates =
   //       getVisibleDates(nextDate, [], 6, visibleDatesCount).cast();
   //   _currentViewVisibleDates = _visibleDates;
@@ -431,8 +450,9 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   int appointmentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    _currentViewVisibleDates =
-        getVisibleDates(currentDate, [], 6, visibleDatesCount).cast();
+    // _currentViewVisibleDates =
+    // DateUtils().getDaysInMonth(currentDate.year,currentDate.month)
+    // getVisibleDates(currentDate, [], 6, visibleDatesCount).cast();
     return SafeArea(
         child: Stack(
       fit: StackFit.expand,
@@ -465,14 +485,12 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                               border: bottomBorder),
                           child: Row(
                               children: List.generate(
-                                  math.max(0,
-                                      _currentViewVisibleDates.length * 2 - 1),
+                                  math.max(0, _visibleDates.length * 2 - 1),
                                   (index) {
                             if (index.isEven) {
                               final int itemIndex = index ~/ 2;
                               final now = DateTime.now();
-                              final visibleDate =
-                                  _currentViewVisibleDates[itemIndex];
+                              final visibleDate = _visibleDates[itemIndex];
                               final isToday = visibleDate.day == now.day &&
                                   visibleDate.month == now.month &&
                                   visibleDate.year == now.year;
@@ -506,9 +524,9 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                 },
                                 child: SizedBox(
                                   height: (listResources.length * 92) + 82,
-                                  width: _currentViewVisibleDates.length * 52,
+                                  width: _visibleDates.length * 52,
                                   child: CustomScrollView(
-                                      controller: _mycontroller1,
+                                      controller: appointmentsVertController,
                                       slivers: [
                                         SliverList(
                                             delegate: SliverChildListDelegate(
@@ -554,7 +572,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         children: List.generate(
                                                             math.max(
                                                                 0,
-                                                                _currentViewVisibleDates
+                                                                _visibleDates
                                                                             .length *
                                                                         2 -
                                                                     1),
@@ -564,18 +582,18 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                             index ~/ 2;
 
                                                         final visibleDate =
-                                                            _currentViewVisibleDates[
+                                                            _visibleDates[
                                                                 itemIndex];
                                                         final nextVisDate =
-                                                            _currentViewVisibleDates[
-                                                                itemIndex ==
-                                                                        _currentViewVisibleDates.length -
-                                                                            1
-                                                                    ? itemIndex
-                                                                    : itemIndex +
-                                                                        1];
+                                                            _visibleDates[itemIndex ==
+                                                                    _visibleDates
+                                                                            .length -
+                                                                        1
+                                                                ? itemIndex
+                                                                : itemIndex +
+                                                                    1];
                                                         // final prevVisDate =
-                                                        //     _currentViewVisibleDates[
+                                                        //     _visibleDates[
                                                         //         itemIndex == 0
                                                         //             ? itemIndex
                                                         //             : itemIndex -
@@ -700,7 +718,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         //       departureArrivalDateDiff !=
                                                         //           0) {
                                                         //     _isAppointmentTail =
-                                                        //         _currentViewVisibleDates[
+                                                        //         _visibleDates[
                                                         //                 appointmentIndex +
                                                         //                     i] ==
                                                         //             visibleDate;
@@ -819,7 +837,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                             ),
                             onNotification: (ScrollNotification scrollInfo) {
                               _syncScroller?.processNotification(
-                                  scrollInfo, _mycontroller1);
+                                  scrollInfo, appointmentsVertController);
                               return true;
                             }),
                       ],
@@ -841,7 +859,8 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
           width: 89,
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
-              _syncScroller?.processNotification(scrollInfo, _mycontroller2);
+              _syncScroller?.processNotification(
+                  scrollInfo, resourcesVertController);
               return true;
             },
             child: NotificationListener<OverscrollIndicatorNotification>(
@@ -852,7 +871,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
               child: SizedBox(
                 width: 89,
                 child: CustomScrollView(
-                  controller: _mycontroller2,
+                  controller: resourcesVertController,
                   slivers: [
                     SliverList(
                       delegate: SliverChildListDelegate(

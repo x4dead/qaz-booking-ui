@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 import '../appointment_engine/appointment_helper.dart';
 import 'enums.dart';
@@ -32,6 +33,20 @@ class DateTimeHelper {
         /// since timeline month doesn't support the number of weeks in view.
         return DateTime.daysPerWeek * 6;
     }
+  }
+
+  /// Returns the list of current month dates alone from the dates passed.
+  static List<DateTime> getMonthDates({required int year, required int month}) {
+    List<DateTime> listDates = [];
+    final dateCount = DateUtils.getDaysInMonth(year, month);
+    for (int i = 0; i < dateCount;) {
+      i++;
+      final DateTime currentDate = DateTime(year, month, i);
+
+      listDates.add(currentDate);
+    }
+
+    return listDates;
   }
 
   /// Returns the list of current month dates alone from the dates passed.
