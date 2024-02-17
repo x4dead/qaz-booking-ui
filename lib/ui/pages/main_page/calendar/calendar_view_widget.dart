@@ -42,7 +42,9 @@ import 'package:syncfusion_flutter_core/core_internal.dart';
 //   DateTime? draggingTime;
 //   double? timeIntervalHeight;
 // }
-
+///
+///TODO: Вынести часто используемые числовые значения в ui constants
+///
 class CalendarViewWidget extends StatefulWidget {
   const CalendarViewWidget({super.key});
 
@@ -51,11 +53,12 @@ class CalendarViewWidget extends StatefulWidget {
 }
 
 class _CalendarViewWidgetState extends State<CalendarViewWidget> {
-  ///Контроллер для скролла карточек записи гостей по вертикали
-  ScrollController appointmentsVertController = ScrollController();
-
-  ///Контроллер для скролла карточек объектов для бронирования по вертикали
-  ScrollController resourcesVertController = ScrollController();
+  //_resourcesVertController Контроллер для скролла карточек объектов для бронирования по ВЕРТИКАЛИ
+  late final ScrollController _resourcesVertController = ScrollController(),
+      //appointmentsVertController Контроллер для скролла карточек записи гостей по ВЕРТИКАЛИ
+      appointmentsVertController = ScrollController(),
+      //appointmentsHorController Контроллер для скролла карточек записи гостей по ГОРИЗОНТАЛИ
+      appointmentsHorController;
 
   ///Контроллер синхронного скролла
   SyncScrollController? _syncScroller;
@@ -76,17 +79,15 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
       _previousViewVisibleDates,
       _nextViewVisibleDates,
       _currentViewVisibleDates;
-  final int visibleDatesCount =
-      DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 6, -1, []);
+  // final int visibleDatesCount =
+  //     DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 6, -1, []);
   DateTime previousMonth = DateTime(now.year, now.month - 1);
   DateTime nextMonth = DateTime(now.year, now.month + 1);
-  DateTime currentMonth = DateTime(now.year, now.month);
+  DateTime currentMonth = DateTime(now.year, now.month, now.day);
 
   @override
   void initState() {
     super.initState();
-    _syncScroller = SyncScrollController(
-        [appointmentsVertController, resourcesVertController]);
 
     _previousViewVisibleDates = DateTimeHelper.getMonthDates(
         year: previousMonth.year, month: previousMonth.month);
@@ -100,6 +101,12 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
       ..._currentViewVisibleDates,
       ..._nextViewVisibleDates
     ];
+    final todayDateIndex = _visibleDates.indexWhere(
+        (e) => e.year == now.year && e.month == now.month && e.day == now.day);
+    appointmentsHorController = ScrollController(
+        initialScrollOffset: todayDateIndex * (appointmentSize + 6));
+    _syncScroller = SyncScrollController(
+        [appointmentsVertController, _resourcesVertController]);
 
     // _dragDetails = ValueNotifier<_DragPaintDetails>(
     //     _DragPaintDetails(position: ValueNotifier<Offset?>(null)));
@@ -195,7 +202,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
     // }
 
     appointmentsVertController.dispose();
-    resourcesVertController.dispose();
+    _resourcesVertController.dispose();
     _syncScroller?._registeredScrollControllers.every((e) {
       e.dispose();
       return false;
@@ -467,6 +474,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
           left: 89,
           child: CustomScrollView(
             scrollDirection: Axis.horizontal,
+            controller: appointmentsHorController,
             slivers: [
               SliverList(
                 delegate: SliverChildListDelegate(
@@ -779,8 +787,10 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                           children: [
                                                             if (isTail == true)
                                                               const SizedBox(
-                                                                  height: 46,
-                                                                  width: 46)
+                                                                  height:
+                                                                      appointmentSize,
+                                                                  width:
+                                                                      appointmentSize)
                                                             else
                                                               DateView(
                                                                 bgColor: AppColors
@@ -801,11 +811,11 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                 left: 0,
 
                                                                 ///ВЫСТАВЛЯЕМ ШИРИНУ КАРТОЧКИ
-                                                                ///УМНОЖАЕМ 46 НА КОЛИЧЕСТВО ДНЕЙ МЕЖДУ ДАТОЙ ЗАЕЗДА И ВЫЕЗДА
+                                                                ///УМНОЖАЕМ appointmentSize(46) НА КОЛИЧЕСТВО ДНЕЙ МЕЖДУ ДАТОЙ ЗАЕЗДА И ВЫЕЗДА
                                                                 ///ДОБАВЛЯЕМ К ПОЛУЧЕННОМУ ОТСТУПЫ МЕЖДУ КАРТОЧКАМИ
                                                                 width: startEndDiffDates
                                                                             .length *
-                                                                        46 +
+                                                                        appointmentSize +
                                                                     (startEndDiffDates.length !=
                                                                             1
                                                                         ? (startEndDiffDates.length -
@@ -860,7 +870,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
               _syncScroller?.processNotification(
-                  scrollInfo, resourcesVertController);
+                  scrollInfo, _resourcesVertController);
               return true;
             },
             child: NotificationListener<OverscrollIndicatorNotification>(
@@ -871,7 +881,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
               child: SizedBox(
                 width: 89,
                 child: CustomScrollView(
-                  controller: resourcesVertController,
+                  controller: _resourcesVertController,
                   slivers: [
                     SliverList(
                       delegate: SliverChildListDelegate(
