@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/drawer_menu.dart';
 import 'package:qaz_booking_ui/ui/widgets/splash_button.dart';
@@ -43,12 +44,12 @@ class _ArchivePageState extends State<ArchivePage> {
           SliverPadding(
             padding: kPV15,
             sliver: SliverList.separated(
-              itemCount: 6,
+              itemCount: listAppointment.length,
               itemBuilder: (ctx, index) {
                 return SplashButton(
                   onTap: () {
                     context.pushNamed('guest_info',
-                        extra: {"is_register_guest": false});
+                        extra: {"info": listAppointment[index].toMap()});
                   },
                   child: SizedBox(
                     height: 98,
@@ -64,7 +65,7 @@ class _ArchivePageState extends State<ArchivePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Рудольф Г. В.',
+                                  listAppointment[index].guestFullname ?? '',
                                   style: AppTextStyle.w500s20.copyWith(
                                       color: AppColors.colorBlack,
                                       height: 24.0.toFigmaHeight(20),

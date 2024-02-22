@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qaz_booking_ui/model/guest_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/pages/archive_page/archive_page.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
@@ -88,8 +89,16 @@ class AppRouter {
           path: '/guest_info',
           pageBuilder: (context, state) {
             final map = state.extra as Map<String, dynamic>;
+            // if (map?['nav_instant_effect'] != true) {
+            //  return MaterialPageRoute(builder: builder)
+            // }
             return FadeTransitionPage(
-                child: GuestInfoPage(isRegisterGuest: map["is_register_guest"]),
+                // isInstantEffect: true,
+                child: GuestInfoPage(
+                    guestModel: map['info'] == null
+                        ? null
+                        : GuestModel.fromMap(map['info']),
+                    isRegisterGuest: map["is_register_guest"] ?? false),
                 key: state.pageKey);
           },
         ),

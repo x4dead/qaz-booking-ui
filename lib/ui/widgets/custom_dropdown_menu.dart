@@ -14,11 +14,13 @@ class CustomDropdownMenu extends StatefulWidget {
       required this.hintText,
       this.onSelected,
       this.textEditingController,
-      this.initialSelectedObject});
+      this.initialSelectedObject,
+      this.overlineText});
   final List<String> menuObjects;
   final String floatingLabelText;
   final String? initialSelectedObject;
   final String hintText;
+  final String? overlineText;
   final void Function(String)? onSelected;
   final TextEditingController? textEditingController;
 
@@ -69,6 +71,8 @@ class _CustomDropdownMenuState extends State<CustomDropdownMenu> {
     }
   }
 
+  final isObjectChanged = ValueNotifier<bool>(false);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -78,118 +82,188 @@ class _CustomDropdownMenuState extends State<CustomDropdownMenu> {
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                MenuAnchor(
-                  style: MenuStyle(
-                    padding: const MaterialStatePropertyAll(kPZero),
-                    elevation: const MaterialStatePropertyAll(0),
-                    side: const MaterialStatePropertyAll(BorderSide.none),
-                    maximumSize: MaterialStatePropertyAll(
-                        Size(constraints.maxWidth, 300)),
-                  ),
-                  crossAxisUnconstrained: false,
-                  alignmentOffset: const Offset(0, -56),
-                  controller: _menuController,
-                  menuChildren: [
-                    TextFieldTapRegion(
-                      onTapOutside: (event) {
-                        focusNode.unfocus();
-                        closeMenu();
-                      },
-                      child: Container(
-                        constraints: const BoxConstraints(maxHeight: 300),
-                        width: constraints.maxWidth,
-                        decoration: BoxDecoration(
-                          color: AppColors.colorWhite,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.colorDarkGray,
-                            width: 1,
-                            strokeAlign: BorderSide.strokeAlignInside,
+                ValueListenableBuilder(
+                    valueListenable: isObjectChanged,
+                    builder: (context, value, child) {
+                      return MenuAnchor(
+                        clipBehavior: Clip.none,
+                        style: MenuStyle(
+                          padding: const MaterialStatePropertyAll(kPZero),
+                          elevation: const MaterialStatePropertyAll(0),
+                          side: const MaterialStatePropertyAll(BorderSide.none),
+                          maximumSize: MaterialStatePropertyAll(
+                              Size(constraints.maxWidth, 300)),
+                        ),
+                        // crossAxisUnconstrained: false,
+                        alignmentOffset: Offset(
+                            0,
+                            widget.overlineText != null &&
+                                    isObjectChanged.value == false
+                                ? -76.5
+                                : -57.5),
+                        controller: _menuController,
+                        builder: (context, controller, child) => Container(
+                          width: constraints.maxWidth,
+                          decoration: BoxDecoration(
+                            color: AppColors.colorWhite,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppColors.colorGray,
+                              width: 1,
+                              strokeAlign: BorderSide.strokeAlignInside,
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                height: widget.overlineText != null &&
+                                        isObjectChanged.value == false
+                                    ? 75
+                                    : null,
+                                child: FloatingLabelTextField(
+                                  onTap: handlePressed,
+                                  focusedBorder: InputBorder.none,
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  readOnly: true,
+                                  myFocusNode: focusNode,
+                                  controller: _textController,
+                                  floatingLabelText: widget.floatingLabelText,
+                                  hintText: widget.hintText,
+                                  suffix: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.keyboard_arrow_down_rounded,
+                                          color: AppColors.colorBlack),
+                                      kSBW20
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if (widget.overlineText != null &&
+                                  isObjectChanged.value == false)
+                                Positioned(
+                                    left: 20,
+                                    top: 40,
+                                    child: Text(
+                                      '${widget.overlineText} спальных места',
+                                      style: AppTextStyle.w500s16
+                                          .copyWith(color: AppColors.colorGray),
+                                    )),
+                            ],
                           ),
                         ),
-                        child:
-                            Column(mainAxisSize: MainAxisSize.min, children: [
-                          FloatingLabelTextField(
-                            onChanged: (p0) => filter(),
-                            myFocusNode: focusNode,
-                            floatingLabelLeftPosition: 21,
-                            floatingLabelTopPosition: -9,
-                            contentPadding:
-                                const EdgeInsets.fromLTRB(19, 16.5, 19, 12.5),
-                            constraints: BoxConstraints(
-                                maxHeight:
-                                    filteredEntries.value.isEmpty ? 56 : 50),
-                            controller: _textController,
-                            floatingLabelText: widget.floatingLabelText,
-                            focusedBorder: InputBorder.none,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            hintText: widget.hintText,
-                            suffix: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SplashButton(
-                                  onTap: handlePressed,
-                                  child: const Icon(
-                                      Icons.keyboard_arrow_up_rounded,
-                                      color: AppColors.colorBlack),
+                        menuChildren: [
+                          TextFieldTapRegion(
+                            onTapOutside: (event) {
+                              focusNode.unfocus();
+                              closeMenu();
+                            },
+                            child: Container(
+                              constraints: const BoxConstraints(maxHeight: 300),
+                              width: constraints.maxWidth,
+                              decoration: BoxDecoration(
+                                color: AppColors.colorWhite,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: AppColors.colorDarkGray,
+                                  width: 1,
+                                  strokeAlign: BorderSide.strokeAlignInside,
                                 ),
-                                kSBW20
-                              ],
+                              ),
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    FloatingLabelTextField(
+                                      onChanged: (p0) => filter(),
+                                      myFocusNode: focusNode,
+                                      floatingLabelLeftPosition: 21,
+                                      floatingLabelTopPosition: -9,
+                                      contentPadding: const EdgeInsets.fromLTRB(
+                                          19, 16.5, 19, 12.5),
+                                      constraints: BoxConstraints(
+                                          maxHeight:
+                                              filteredEntries.value.isEmpty
+                                                  ? 56
+                                                  : 50),
+                                      controller: _textController,
+                                      floatingLabelText:
+                                          widget.floatingLabelText,
+                                      focusedBorder: InputBorder.none,
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      hintText: widget.hintText,
+                                      suffix: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SplashButton(
+                                            onTap: handlePressed,
+                                            child: const Icon(
+                                                Icons.keyboard_arrow_up_rounded,
+                                                color: AppColors.colorBlack),
+                                          ),
+                                          kSBW20
+                                        ],
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            ...List.generate(
+                                                filteredEntries.value.length,
+                                                (index) => SplashButton(
+                                                    onTap: () {
+                                                      _textController.text =
+                                                          filteredEntries
+                                                              .value[index];
+                                                      isObjectChanged.value =
+                                                          true;
+                                                      _menuController.close();
+                                                      focusNode.unfocus();
+                                                      widget.onSelected?.call(
+                                                          filteredEntries
+                                                              .value[index]);
+                                                    },
+                                                    child: SizedBox(
+                                                      height: 51,
+                                                      width: double.infinity,
+                                                      child: Padding(
+                                                        padding: kPH20V12,
+                                                        child: Text(
+                                                          filteredEntries
+                                                              .value[index],
+                                                          style: AppTextStyle
+                                                              .w500s16,
+                                                        ),
+                                                      ),
+                                                    )))
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ]),
                             ),
                           ),
-                          Flexible(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  ...List.generate(
-                                      filteredEntries.value.length,
-                                      (index) => SplashButton(
-                                          onTap: () {
-                                            _textController.text =
-                                                filteredEntries.value[index];
-
-                                            _menuController.close();
-                                            focusNode.unfocus();
-                                            widget.onSelected?.call(
-                                                filteredEntries.value[index]);
-                                          },
-                                          child: SizedBox(
-                                            height: 51,
-                                            width: double.infinity,
-                                            child: Padding(
-                                              padding: kPH20V12,
-                                              child: Text(
-                                                filteredEntries.value[index],
-                                                style: AppTextStyle.w500s16,
-                                              ),
-                                            ),
-                                          )))
-                                ],
-                              ),
-                            ),
-                          )
-                        ]),
-                      ),
-                    ),
-                  ],
-                  child: FloatingLabelTextField(
-                    onTap: handlePressed,
-                    readOnly: true,
-                    myFocusNode: focusNode,
-                    controller: _textController,
-                    floatingLabelText: widget.floatingLabelText,
-                    hintText: widget.hintText,
-                    suffix: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.keyboard_arrow_down_rounded,
-                            color: AppColors.colorBlack),
-                        kSBW20
-                      ],
-                    ),
-                  ),
-                ),
+                        ],
+                        // child: FloatingLabelTextField(
+                        //   onTap: handlePressed,
+                        //   readOnly: true,
+                        //   myFocusNode: focusNode,
+                        //   controller: _textController,
+                        //   floatingLabelText: widget.floatingLabelText,
+                        //   hintText: widget.hintText,
+                        //   suffix: const Row(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     children: [
+                        //       Icon(Icons.keyboard_arrow_down_rounded,
+                        //           color: AppColors.colorBlack),
+                        //       kSBW20
+                        //     ],
+                        //   ),
+                        // ),
+                      );
+                    }),
               ],
             );
           });

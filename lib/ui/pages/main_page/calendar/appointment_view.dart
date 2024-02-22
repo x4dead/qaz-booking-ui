@@ -9,8 +9,10 @@ class AppointmentViewWidget extends StatelessWidget {
   const AppointmentViewWidget({
     super.key,
     required this.appointment,
+    this.borderRadius,
   });
   final GuestModel appointment;
+  final BorderRadius? borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,8 @@ class AppointmentViewWidget extends StatelessWidget {
         height: 46,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         decoration: BoxDecoration(
-            color: appointment.color, borderRadius: BorderRadius.circular(12)),
+            color: appointment.color,
+            borderRadius: borderRadius ?? BorderRadius.circular(12)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,5 @@
-﻿import 'dart:convert';
+﻿// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
 import 'dart:ui';
 
 class GuestModel {
@@ -76,4 +77,68 @@ class GuestModel {
         color: color ?? this.color,
         comment: comment ?? this.comment,
       );
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'startDate': startDate?.millisecondsSinceEpoch,
+      'startTime': startTime,
+      'endDate': endDate?.millisecondsSinceEpoch,
+      'endTime': endTime,
+      'bookingStatus': bookingStatus,
+      'objectName': objectName,
+      'adultsCount': adultsCount,
+      'childrenCount': childrenCount,
+      'guestFullname': guestFullname,
+      'phoneNumber': phoneNumber,
+      'paymentMethod': paymentMethod,
+      'prepayment': prepayment,
+      'payment': payment,
+      'photosOfDocuments': photosOfDocuments,
+      'color': color?.value,
+      'comment': comment,
+      'resourceId': resourceId,
+    };
+  }
+
+  factory GuestModel.fromMap(Map<String, dynamic> map) {
+    return GuestModel(
+      startDate: map['startDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['startDate'] as int)
+          : null,
+      startTime: map['startTime'] != null ? map['startTime'] as String : null,
+      endDate: map['endDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['endDate'] as int)
+          : null,
+      endTime: map['endTime'] != null ? map['endTime'] as String : null,
+      bookingStatus:
+          map['bookingStatus'] != null ? map['bookingStatus'] as String : null,
+      objectName:
+          map['objectName'] != null ? map['objectName'] as String : null,
+      adultsCount:
+          map['adultsCount'] != null ? map['adultsCount'] as int : null,
+      childrenCount:
+          map['childrenCount'] != null ? map['childrenCount'] as int : null,
+      guestFullname:
+          map['guestFullname'] != null ? map['guestFullname'] as String : null,
+      phoneNumber:
+          map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
+      paymentMethod:
+          map['paymentMethod'] != null ? map['paymentMethod'] as String : null,
+      prepayment:
+          map['prepayment'] != null ? map['prepayment'] as String : null,
+      payment: map['payment'] != null ? map['payment'] as String : null,
+      photosOfDocuments: map['photosOfDocuments'] != null
+          ? List<String>.from((map['photosOfDocuments'] as List<String>))
+          : null,
+      color: map['color'] != null ? Color(map['color'] as int) : null,
+      comment: map['comment'] != null ? map['comment'] as String : null,
+      resourceId:
+          map['resourceId'] != null ? map['resourceId'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory GuestModel.fromJson(String source) =>
+      GuestModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

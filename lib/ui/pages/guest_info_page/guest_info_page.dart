@@ -3,7 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:qaz_booking_ui/model/guest_model.dart';
+import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_calendar_dialog.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_chip.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
@@ -17,29 +20,102 @@ import 'dart:math' as math;
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
 class GuestInfoPage extends StatefulWidget {
-  const GuestInfoPage({super.key, this.isRegisterGuest = false});
+  const GuestInfoPage(
+      {super.key,
+      this.isRegisterGuest = false,
+      this.guestModel,
+      this.objectToBook});
   final bool isRegisterGuest;
-
+  final GuestModel? guestModel;
+  final ObjectToBook? objectToBook;
   @override
   State<GuestInfoPage> createState() => _GuestInfoPageState();
 }
 
 class _GuestInfoPageState extends State<GuestInfoPage> {
+  late TextEditingController bookingStatus;
+  late TextEditingController guestChildren;
+  late TextEditingController guestAdults;
+  late TextEditingController guestFullName;
+  late TextEditingController objectName;
+  late TextEditingController paymentMethod;
+  late TextEditingController guestPhone;
+  late TextEditingController prepayment;
+  late TextEditingController payment;
+  late TextEditingController comment;
+  late TextEditingController startDate;
+  late TextEditingController startTime;
+  late TextEditingController endDate;
+  late TextEditingController endTime;
   final selectedColorIndex = ValueNotifier<int>(1);
-  final bookingStatus = TextEditingController();
-  final guestChildren = TextEditingController();
-  final guestAdults = TextEditingController();
-  final guestFullName = TextEditingController();
-  final objectName = TextEditingController();
-  final paymentMethod = TextEditingController();
-  final guestPhone = TextEditingController();
-  final prepayment = TextEditingController();
-  final payment = TextEditingController();
-  final comment = TextEditingController();
-  final startDate = TextEditingController();
-  final startTime = TextEditingController();
-  final endDate = TextEditingController();
-  final endTime = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    selectedColorIndex.value = widget.isRegisterGuest == true
+        ? 1
+        : switch (widget.guestModel?.color) {
+            AppColors.colorBlue => 0,
+            AppColors.colorBlue => 1,
+            AppColors.colorOrange => 2,
+            _ => 3
+          };
+    bookingStatus = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.bookingStatus ?? "");
+    guestChildren = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.childrenCount?.toString() ?? '');
+    guestAdults = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.adultsCount?.toString() ?? '');
+    guestFullName = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.guestFullname ?? "");
+    objectName = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.objectName ?? "");
+    paymentMethod = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.paymentMethod ?? "");
+    guestPhone = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.phoneNumber ?? "");
+    prepayment = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.prepayment ?? "");
+    payment = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.payment ?? "");
+    comment = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.comment ?? "");
+    startDate = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : DateFormat("dd.MM.y").format(widget.guestModel!.startDate!));
+    startTime = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.startTime ?? "");
+    endDate = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : DateFormat("dd.MM.y").format(widget.guestModel!.endDate!));
+    endTime = TextEditingController(
+        text: widget.isRegisterGuest == true
+            ? ""
+            : widget.guestModel?.endTime ?? "");
+  }
 
   @override
   void dispose() {
@@ -71,9 +147,6 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
     listImgs.value[index] = url;
   }
 
-  DateTime? initStartSelectedDate;
-
-  DateTime? initEndSelectedDate;
   _showCalendarDialog(BuildContext ctx,
       {required DateTime firstDate,
       required DateTime initialDate,
@@ -119,10 +192,17 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
       );
     }
 
+    final List<String> listObjects = [];
+    for (var element in listResources) {
+      listObjects.add(element.objectName ?? '');
+    }
+
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
       appBar: CustomAppBar(
-        title: 'Галина П. А.',
+        title: widget.isRegisterGuest == true
+            ? "Запись гостя"
+            : widget.guestModel?.guestFullname ?? '???',
         action: (
           SvgPicture.asset(
             AppImages.save,
@@ -143,11 +223,15 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                   _showCalendarDialog(
                     context,
                     firstDate: DateTime(1900),
-                    initialDate: initStartSelectedDate ?? DateTime.now(),
+                    initialDate: widget.guestModel?.startDate != null
+                        ? widget.guestModel!.startDate!
+                        // initEndSelectedDate
+                        : DateTime.now(),
                     lastDate: DateTime(DateTime.now().year + 10),
                     onDateChanged: (value) {
                       startDate.text = DateFormat("dd.MM.y").format(value);
-                      initStartSelectedDate = value;
+                      // initStartSelectedDate
+                      // startDate.text = value.toIso8601String();
                     },
                   );
                 },
@@ -170,11 +254,16 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
                   _showCalendarDialog(
                     context,
                     firstDate: DateTime(1900),
-                    initialDate: initEndSelectedDate ?? DateTime.now(),
+                    initialDate: widget.guestModel?.endDate != null
+                        ? widget.guestModel!.endDate!
+                        // initEndSelectedDate
+                        : DateTime.now(),
                     lastDate: DateTime(DateTime.now().year + 10),
                     onDateChanged: (value) {
                       endDate.text = DateFormat("dd.MM.y").format(value);
-                      initEndSelectedDate = value;
+
+                      // initEndSelectedDate = value;
+                      // endDate.text = value.toString();
                     },
                   );
                 },
@@ -214,20 +303,18 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
               kSBH25,
               kSBH10,
               CustomDropdownMenu(
+                overlineText: widget.isRegisterGuest == false
+                    ? "2"
+                    //  widget.objectToBook?.roomsCount?
+                    // .toString()
+                    : null,
                 textEditingController: objectName,
                 initialSelectedObject: 'Комната 1',
                 onSelected: (p0) {},
                 floatingLabelText:
                     widget.isRegisterGuest == true ? 'Объект' : 'Комната',
                 hintText: "Введите текст",
-                menuObjects: const [
-                  'Комната 1',
-                  'Комната 2',
-                  'Комната 3',
-                  'Комната 4',
-                  'Комната 5',
-                  'Комната 6',
-                ],
+                menuObjects: listObjects,
               ),
               kSBH25,
               CustomDropdownMenu(
