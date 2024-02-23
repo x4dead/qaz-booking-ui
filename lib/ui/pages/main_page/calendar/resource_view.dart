@@ -34,7 +34,7 @@ class ResourceViewWidget extends StatelessWidget {
           kSBH4,
           Text(resource.objectName!, style: resourceStyle),
           kSBH2,
-          Text(resource.object!, style: resourceStyle),
+          Text(resource.objectType!, style: resourceStyle),
           kSBH2,
           Text("${resource.roomsCount!} персоны", style: resourceStyle),
         ],

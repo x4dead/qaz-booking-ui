@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qaz_booking_ui/model/guest_model.dart';
+import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/pages/archive_page/archive_page.dart';
 import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
@@ -80,25 +81,30 @@ class AppRouter {
           name: 'booking_object',
           path: '/booking_object',
           pageBuilder: (context, state) {
+            Map<String, dynamic>? map = state.extra as Map<String, dynamic>?;
             return FadeTransitionPage(
-                child: const BookingObjectPage(), key: state.pageKey);
+                child: BookingObjectPage(
+                    objectToBook: map?['info'] == null
+                        ? null
+                        : ObjectToBook.fromMap(map?['info'])),
+                key: state.pageKey);
           },
         ),
         GoRoute(
           name: 'guest_info',
           path: '/guest_info',
           pageBuilder: (context, state) {
-            final map = state.extra as Map<String, dynamic>;
+            Map<String, dynamic>? map = state.extra as Map<String, dynamic>?;
             // if (map?['nav_instant_effect'] != true) {
             //  return MaterialPageRoute(builder: builder)
             // }
             return FadeTransitionPage(
                 // isInstantEffect: true,
                 child: GuestInfoPage(
-                    guestModel: map['info'] == null
+                    guestModel: map?['info'] == null
                         ? null
-                        : GuestModel.fromMap(map['info']),
-                    isRegisterGuest: map["is_register_guest"] ?? false),
+                        : GuestModel.fromMap(map?['info']),
+                    isRegisterGuest: map?["is_register_guest"] ?? false),
                 key: state.pageKey);
           },
         ),

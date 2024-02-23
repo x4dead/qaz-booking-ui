@@ -1,9 +1,9 @@
 ﻿import 'dart:math' as math;
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/hour_view.dart';
+import 'package:qaz_booking_ui/ui/widgets/custom_calendar_dialog.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 import 'package:qaz_booking_ui/model/guest_model.dart';
 import 'package:qaz_booking_ui/model/object_to_book_model.dart';
@@ -18,26 +18,17 @@ import 'package:qaz_booking_ui/ui/widgets/splash_button.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
-// class _DragPaintDetails {
-//   _DragPaintDetails(
-//       // ignore: unused_element
-//       {this.appointmentView,
-//       required this.position,
-//       // ignore: unused_element
-//       this.draggingTime,
-//       // ignore: unused_element
-//       this.timeIntervalHeight});
-
-//   AppointmentView? appointmentView;
-//   final ValueNotifier<Offset?> position;
-//   DateTime? draggingTime;
-//   double? timeIntervalHeight;
-// }
 ///
 ///TODO: Вынести часто используемые числовые значения в ui constants
 ///
+enum CalendarViewEnum {
+  day,
+  hour,
+}
+
 class CalendarViewWidget extends StatefulWidget {
-  const CalendarViewWidget({super.key});
+  const CalendarViewWidget({super.key, required this.calendarViewEnum});
+  final ValueNotifier<CalendarViewEnum> calendarViewEnum;
 
   @override
   State<CalendarViewWidget> createState() => _CalendarViewWidgetState();
@@ -53,33 +44,26 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
 
   ///Контроллер синхронного скролла
   SyncScrollController? _syncScroller = SyncScrollController([]);
-  // ScrollController? _scrollController;
-  // ScrollController? _timelineViewHeaderScrollController,
-  // _timelineViewVerticalScrollController,
-  // _timelineRulerController,
-  // _resourcePanelScrollController;
-  // Drag? _drag;
-  // late double _scrollStartPosition;
-  // double _timelineScrollStartPosition = 0;
-  // double _timelineStartPosition = 0;
-  // late ValueNotifier<_DragPaintDetails> _dragDetails;
-  // Offset? _dragDifferenceOffset;
-  // Timer? _timer;
+  List<int> getHours() {
+    List<int> hours = [];
+    for (int i = 0; i < 24; i++) {
+      hours.add(i);
+    }
+    return hours;
+  }
+
+  late final List<int> visibleTimes = getHours();
 
   late List<DateTime> _visibleDates,
       _previousViewVisibleDates,
       _nextViewVisibleDates,
       _currentViewVisibleDates;
-  // final int visibleDatesCount =
-  //     DateTimeHelper.getViewDatesCount(CalendarView.timelineMonth, 6, -1, []);
   DateTime previousMonth = DateTime(now.year, now.month - 1);
   DateTime nextMonth = DateTime(now.year, now.month + 1);
   DateTime currentMonth = DateTime(now.year, now.month, now.day);
-
   @override
   void initState() {
     super.initState();
-
     _previousViewVisibleDates = DateTimeHelper.getMonthDates(
         year: previousMonth.year, month: previousMonth.month);
     _currentViewVisibleDates = DateTimeHelper.getMonthDates(
@@ -92,8 +76,14 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
       ..._currentViewVisibleDates,
       // ..._nextViewVisibleDates
     ];
-    final todayDateIndex = _visibleDates.indexWhere(
-        (e) => e.year == now.year && e.month == now.month && e.day == now.day);
+    final todayDateIndex = widget.calendarViewEnum.value == CalendarViewEnum.day
+        ? _visibleDates.indexWhere((e) =>
+            e.year == now.year && e.month == now.month && e.day == now.day)
+        : visibleTimes.indexWhere((e) =>
+            selectedDay.value.year == now.year &&
+            selectedDay.value.month == now.month &&
+            selectedDay.value.day == now.day &&
+            e == selectedDay.value.hour);
     appointmentsHorController = ScrollController(
         initialScrollOffset: todayDateIndex * (appointmentSize + 6));
     _syncScroller = SyncScrollController(
@@ -172,26 +162,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   @override
   void dispose() {
     super.dispose();
-    // if (_resourcePanelScrollController != null) {
-    //   _resourcePanelScrollController!.dispose();
-    //   _resourcePanelScrollController = null;
-    // }
-
-    // if (_scrollController != null) {
-    //   _scrollController!.removeListener(_scrollListener);
-    //   _scrollController!.dispose();
-    //   _scrollController = null;
-    // }
-    // if (_timelineViewHeaderScrollController != null) {
-    //   _timelineViewHeaderScrollController!.dispose();
-    //   _timelineViewHeaderScrollController = null;
-    // }
-
-    // if (_timelineRulerController != null) {
-    //   _timelineRulerController!.dispose();
-    //   _timelineRulerController = null;
-    // }
-
+    appointmentsHorController.dispose();
     appointmentsVertController.dispose();
     _resourcesVertController.dispose();
     _syncScroller?._scrollingController?.dispose();
@@ -465,12 +436,15 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
     return days;
   }
 
-  // DateTime? startDate;
-  // DateTime? previusDate;
-  // bool isTail = false;
-  // List<DateTime> startEndDiffDates = [];
-  // int itemIndex = 0;
-  // DateTime? visibleDate;
+  List<DateTime> getDateHours(DateTime startDate, DateTime endDate) {
+    List<DateTime> dates = [];
+
+    for (int i = 0; startDate.add(Duration(hours: i)).isBefore(endDate); i++) {
+      dates.add(startDate.add(Duration(hours: i)));
+    }
+
+    return dates;
+  }
 
   ///appointmentIndex Индекс карточки записи гостя
   int appointmentIndex = 0;
@@ -478,676 +452,721 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
   ///startEndDiffDates Даты после дня заезда до дня выезда
   List<DateTime> startEndDiffDates = [];
 
+  ///startEndDiffTimes Время в часах после дня заезда до дня выезда
+  List<DateTime> startEndDiffTimes = [];
+
   ///startDate Дата заезда гостя
   DateTime? startDate;
-  // bool? isSameStartVisibleDate;
+
+  ///startDate Дата заезда гостя
+  // DateTime? _startDate;
+
   ///visibleDate День из месяца для отображения
   DateTime? visibleDate;
 
+  ///visibleTime Час из дня для отображения
+  int? visibleTime;
+
+  ValueNotifier<DateTime> selectedDay = ValueNotifier(DateTime.now());
+
+  // List<GuestModel> selectedDayAppointments = [];
+
   @override
   Widget build(BuildContext context) {
-    // _currentViewVisibleDates =
-    // DateUtils().getDaysInMonth(currentDate.year,currentDate.month)
-    // getVisibleDates(currentDate, [], 6, visibleDatesCount).cast();
-
     return SafeArea(
-        child: Stack(
-      fit: StackFit.expand,
-      children: [
-        ///
-        ///Даты с записями гостей
-        ///
-        Positioned(
-          right: 0,
-          top: 0,
-          bottom: 0,
-          left: 89,
-          child: CustomScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: appointmentsHorController,
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
+        child: ValueListenableBuilder(
+            valueListenable: widget.calendarViewEnum,
+            builder: (context, v, child) {
+              bool isCalendarDayView =
+                  widget.calendarViewEnum.value == CalendarViewEnum.day;
+              return ValueListenableBuilder(
+                  valueListenable: widget.calendarViewEnum,
+                  builder: (context, v, child) {
+                    return Stack(
+                      fit: StackFit.expand,
                       children: [
                         ///
-                        ///Верхние даты
+                        ///Даты с записями гостей
                         ///
-                        Container(
-                          height: 82,
-                          padding: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: const BoxDecoration(
-                              color: AppColors.colorWhite,
-                              border: bottomBorder),
-                          child: Row(
-                              children: List.generate(
-                                  math.max(0, _visibleDates.length * 2 - 1),
-                                  (index) {
-                            if (index.isEven) {
-                              final int itemIndex = index ~/ 2;
-                              final now = DateTime.now();
-                              visibleDate = _visibleDates[itemIndex];
-                              final isToday = visibleDate?.day == now.day &&
-                                  visibleDate?.month == now.month &&
-                                  visibleDate?.year == now.year;
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          bottom: 0,
+                          left: 89,
+                          child: CustomScrollView(
+                            // key: PageStorageKey('myListView'),
+                            scrollDirection: Axis.horizontal,
+                            controller: appointmentsHorController,
+                            slivers: [
+                              SliverList(
+                                delegate: SliverChildListDelegate(
+                                  [
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ///
+                                        ///Верхние даты
+                                        ///
+                                        Container(
+                                          height: 82,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 3),
+                                          decoration: const BoxDecoration(
+                                              color: AppColors.colorWhite,
+                                              border: bottomBorder),
+                                          child: Row(
+                                              children: List.generate(
+                                                  math.max(
+                                                      0,
+                                                      (isCalendarDayView == true
+                                                                  ? _visibleDates
+                                                                      .length
+                                                                  : visibleTimes
+                                                                      .length) *
+                                                              2 -
+                                                          1), (index) {
+                                            if (index.isEven) {
+                                              final int itemIndex = index ~/ 2;
+                                              final now = DateTime.now();
+                                              if (isCalendarDayView == true) {
+                                                visibleDate =
+                                                    _visibleDates[itemIndex];
+                                                final isToday =
+                                                    visibleDate?.day ==
+                                                            now.day &&
+                                                        visibleDate?.month ==
+                                                            now.month &&
+                                                        visibleDate?.year ==
+                                                            now.year;
 
-                              return DateView(
-                                bgColor: isToday
-                                    ? AppColors.colorBlue
-                                    : AppColors.colorLightGray,
-                                day: visibleDate!.day.toString(),
-                                textColor: isToday
-                                    ? AppColors.colorWhite
-                                    : AppColors.colorDarkGray,
-                                weekDay:
-                                    shortWeekDays[visibleDate!.weekday - 1],
-                              );
-                            }
-                            return kSBW6;
-                          })),
+                                                return DateView(
+                                                  bgColor: isToday
+                                                      ? AppColors.colorBlue
+                                                      : AppColors
+                                                          .colorLightGray,
+                                                  day: visibleDate!.day
+                                                      .toString(),
+                                                  textColor: isToday
+                                                      ? AppColors.colorWhite
+                                                      : AppColors.colorDarkGray,
+                                                  weekDay: shortWeekDays[
+                                                      visibleDate!.weekday - 1],
+                                                );
+                                              } else if (isCalendarDayView ==
+                                                  false) {
+                                                // final int itemIndex =
+                                                //     index ~/ 2;
+                                                // final now = DateTime.now();
+                                                final isCurrenTime =
+                                                    visibleTimes[itemIndex] ==
+                                                        now.hour;
+
+                                                return TimeView(
+                                                  bgColor: isCurrenTime
+                                                      ? AppColors.colorBlue
+                                                      : AppColors
+                                                          .colorLightGray,
+                                                  hour:
+                                                      "${visibleTimes[itemIndex]}:00",
+                                                  textColor: isCurrenTime
+                                                      ? AppColors.colorWhite
+                                                      : AppColors.colorDarkGray,
+                                                );
+                                              }
+                                            }
+                                            return kSBW6;
+                                          })),
+                                        ),
+
+                                        ///
+                                        ///Нижние даты с записями
+                                        ///
+                                        NotificationListener<
+                                                ScrollNotification>(
+                                            child: Flexible(
+                                              child: NotificationListener<
+                                                  OverscrollIndicatorNotification>(
+                                                onNotification:
+                                                    (OverscrollIndicatorNotification
+                                                        overscroll) {
+                                                  overscroll
+                                                      .disallowIndicator();
+                                                  return false;
+                                                },
+                                                child: SizedBox(
+                                                  height:
+                                                      (listResources.length *
+                                                              92) +
+                                                          82,
+                                                  width: (isCalendarDayView ==
+                                                              true
+                                                          ? _visibleDates.length
+                                                          : visibleTimes
+                                                              .length) *
+                                                      52,
+                                                  child: CustomScrollView(
+                                                      controller:
+                                                          appointmentsVertController,
+                                                      slivers: [
+                                                        SliverList(
+                                                            delegate:
+                                                                SliverChildListDelegate(
+                                                          [
+                                                            Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children:
+                                                                  List.generate(
+                                                                listResources
+                                                                    .length,
+                                                                (columnIndex) {
+                                                                  appointmentIndex =
+                                                                      0;
+
+                                                                  ///resource Текущий ряд
+                                                                  ObjectToBook?
+                                                                      resource =
+                                                                      listResources[
+                                                                          columnIndex];
+
+                                                                  ///allResourcesDates Список дат для каждого ряда
+                                                                  List<List<DateTime>>
+                                                                      allResourcesDates =
+                                                                      [];
+
+                                                                  ///allResourcesTimes Список дат для каждого ряда
+                                                                  List<List<int>>
+                                                                      allResourcesTimes =
+                                                                      [];
+                                                                  if (isCalendarDayView ==
+                                                                      true) {
+                                                                    allResourcesDates = List.filled(
+                                                                        (listResources.isNotEmpty
+                                                                            ? listResources.length
+                                                                            : 0),
+                                                                        [
+                                                                          ..._visibleDates
+                                                                        ]);
+                                                                  } else {
+                                                                    allResourcesTimes = List.filled(
+                                                                        (listResources.isNotEmpty
+                                                                            ? listResources.length
+                                                                            : 0),
+                                                                        [
+                                                                          ...visibleTimes
+                                                                        ]);
+                                                                  }
+
+                                                                  ///currentResourceDates Даты для текущего ряда
+                                                                  List<DateTime>
+                                                                      currentResourceDates =
+                                                                      [];
+
+                                                                  ///currentResourceTimes Время для текущего ряда
+                                                                  List<int>
+                                                                      currentResourceTimes =
+                                                                      [];
+                                                                  if (isCalendarDayView ==
+                                                                      true) {
+                                                                    currentResourceDates =
+                                                                        allResourcesDates[
+                                                                            columnIndex];
+                                                                  } else {
+                                                                    currentResourceTimes =
+                                                                        allResourcesTimes[
+                                                                            columnIndex];
+                                                                  }
+
+                                                                  ///currentResourceApointments Записи гостей у текущего ряда
+                                                                  List<GuestModel>
+                                                                      currentResourceApointments =
+                                                                      [];
+
+                                                                  ///Добавляем записи гостей в список
+                                                                  currentResourceApointments.addAll(
+                                                                      listAppointment
+                                                                          .where(
+                                                                              (a) {
+                                                                    if (isCalendarDayView ==
+                                                                        true) {
+                                                                      return a.resourceId ==
+                                                                          resource
+                                                                              .id;
+                                                                    } else {
+                                                                      return selectedDay.value.day ==
+                                                                              a.startDate
+                                                                                  ?.day &&
+                                                                          a.resourceId ==
+                                                                              resource.id;
+                                                                    }
+                                                                  }));
+
+                                                                  ///Сортируем по дате
+                                                                  currentResourceApointments.sort((a, b) => a
+                                                                      .startDate!
+                                                                      .compareTo(
+                                                                          b.startDate!));
+                                                                  print(currentResourceApointments
+                                                                      .length);
+
+                                                                  if (isCalendarDayView ==
+                                                                      true) {
+                                                                    ///Делаем цикл для получения индекса дат для текущего ряда
+                                                                    for (int i =
+                                                                            0;
+                                                                        i < currentResourceDates.length;
+                                                                        i++) {
+                                                                      // ///Помечаем пустым чтобы они не складывались
+                                                                      startEndDiffDates =
+                                                                          [];
+                                                                      visibleDate =
+                                                                          currentResourceDates[
+                                                                              i];
+
+                                                                      ///Если записи гостей в текущем ряду не пусты
+                                                                      if (currentResourceApointments
+                                                                          .isNotEmpty) {
+                                                                        ///Делаем цикл для получения записи гостя
+                                                                        for (var apointment
+                                                                            in currentResourceApointments) {
+                                                                          ///Если дата заезда гостя и текущая дата совпадают
+                                                                          if (isSameDate(
+                                                                              apointment.startDate,
+                                                                              visibleDate)) {
+                                                                            startEndDiffDates = currentResourceApointments.isEmpty
+                                                                                ? []
+                                                                                : getDatesAfterStartDateBeforeEnd(
+                                                                                    apointment.startDate!,
+                                                                                    apointment.endDate!,
+                                                                                  );
+
+                                                                            ///Если даты после дня заезда до дня выезда не пусты
+                                                                            if (startEndDiffDates.isNotEmpty) {
+                                                                              ///Если в списке дат после дня заезда до дня выезда
+                                                                              ///содержутся даты для отображения в текущем ряду
+                                                                              currentResourceDates.removeWhere((e) {
+                                                                                if (startEndDiffDates.contains(e)) {
+                                                                                  return true;
+                                                                                }
+                                                                                return false;
+                                                                              });
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  } else {
+                                                                    ///Делаем цикл для получения индекса час для текущего ряда
+                                                                    for (int i =
+                                                                            0;
+                                                                        i < currentResourceTimes.length;
+                                                                        i++) {
+                                                                      ///Помечаем пустым чтобы они не складывались
+                                                                      startEndDiffTimes =
+                                                                          [];
+                                                                      visibleTime =
+                                                                          currentResourceTimes[
+                                                                              i];
+
+                                                                      ///Если записи гостей в текущем ряду не пусты
+                                                                      if (currentResourceApointments
+                                                                          .isNotEmpty) {
+                                                                        ///Делаем цикл для получения записи гостя
+                                                                        for (var apointment
+                                                                            in currentResourceApointments) {
+                                                                          ///Если дата заезда гостя и текущая дата совпадают
+                                                                          if (apointment.startDate?.hour ==
+                                                                              visibleTime) {
+                                                                            startEndDiffTimes =
+                                                                                getDateHours(
+                                                                              apointment.startDate!,
+                                                                              apointment.endDate!,
+                                                                            );
+
+                                                                            ///Если даты после дня заезда до дня выезда не пусты
+                                                                            if (startEndDiffTimes.isNotEmpty) {
+                                                                              ///Если в списке дат после дня заезда до дня выезда
+                                                                              ///содержутся даты для отображения в текущем ряду
+                                                                              currentResourceTimes.removeWhere((a) {
+                                                                                return startEndDiffTimes.any((b) {
+                                                                                  if (a == b.hour && selectedDay.value.day == b.day) {
+                                                                                    return true;
+                                                                                  }
+                                                                                  return false;
+                                                                                });
+                                                                              });
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                        // }
+                                                                      }
+                                                                    }
+                                                                  }
+
+                                                                  return Container(
+                                                                    height: 92,
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        horizontal:
+                                                                            3),
+                                                                    decoration: const BoxDecoration(
+                                                                        color: AppColors
+                                                                            .colorWhite,
+                                                                        border:
+                                                                            bottomBorder),
+                                                                    child: Row(
+                                                                        children: List.generate(
+                                                                            math.max(0,
+                                                                                (isCalendarDayView == true ? currentResourceDates.length : currentResourceTimes.length) * 2 - 1),
+                                                                            (index) {
+                                                                      final itemIndex =
+                                                                          index ~/
+                                                                              2;
+                                                                      if (index
+                                                                          .isEven) {
+                                                                        int reducedAppointmentIndex =
+                                                                            0;
+
+                                                                        ///isSameStartVisibleDate true ЕСЛИ ДАТА ЗАЕЗДА ГОСТЯ И ДАТА НА ЗАДНЕМ ФОНЕ РАВНЫ
+                                                                        bool
+                                                                            isSameStartVisibleDate =
+                                                                            false;
+                                                                        bool
+                                                                            isAppointment =
+                                                                            false;
+
+                                                                        if (isCalendarDayView ==
+                                                                            true) {
+                                                                          visibleDate =
+                                                                              currentResourceDates[itemIndex];
+                                                                          isSameStartVisibleDate = isSameDate(
+                                                                              startDate,
+                                                                              visibleDate);
+
+                                                                          if (currentResourceApointments.isNotEmpty &&
+                                                                              appointmentIndex < currentResourceApointments.length) {
+                                                                            startDate =
+                                                                                currentResourceApointments[appointmentIndex].startDate!;
+
+                                                                            if (isSameStartVisibleDate == true &&
+                                                                                appointmentIndex < currentResourceApointments.length) {
+                                                                              appointmentIndex++;
+                                                                            }
+                                                                            reducedAppointmentIndex = appointmentIndex == 0
+                                                                                ? appointmentIndex
+                                                                                : appointmentIndex - 1;
+                                                                            startEndDiffDates = currentResourceApointments.isEmpty
+                                                                                ? []
+                                                                                : getDatesAfterStartDateBeforeEnd(
+                                                                                    startDate!,
+                                                                                    currentResourceApointments[
+                                                                                            // appointmentIndex == 0 ? appointmentIndex : appointmentIndex - 1
+                                                                                            reducedAppointmentIndex]
+                                                                                        .endDate!,
+                                                                                  );
+                                                                            // isAppointment =
+                                                                            //     isSameStartVisibleDate == true && currentResourceApointments.isNotEmpty;
+                                                                          }
+                                                                        } else {
+                                                                          isSameStartVisibleDate =
+                                                                              startDate?.hour == visibleTime;
+                                                                          visibleTime =
+                                                                              currentResourceTimes[itemIndex];
+                                                                          if (currentResourceApointments.isNotEmpty &&
+                                                                              appointmentIndex < currentResourceApointments.length) {
+                                                                            startDate =
+                                                                                currentResourceApointments[appointmentIndex].startDate!;
+
+                                                                            if (isSameStartVisibleDate == true
+                                                                                // &&
+                                                                                // appointmentIndex < currentResourceApointments.length
+                                                                                ) {
+                                                                              appointmentIndex++;
+                                                                            }
+                                                                            reducedAppointmentIndex = appointmentIndex == 0
+                                                                                ? appointmentIndex
+                                                                                : appointmentIndex - 1;
+                                                                            startEndDiffTimes = currentResourceApointments.isEmpty
+                                                                                ? []
+                                                                                : getDateHours(
+                                                                                    startDate!,
+                                                                                    currentResourceApointments[reducedAppointmentIndex].endDate!,
+                                                                                  );
+                                                                          }
+                                                                        }
+
+                                                                        isAppointment =
+                                                                            isSameStartVisibleDate == true &&
+                                                                                currentResourceApointments.isNotEmpty;
+
+                                                                        if (isAppointment ==
+                                                                            false) {
+                                                                          if (isCalendarDayView ==
+                                                                              false) {
+                                                                            return GestureDetector(
+                                                                              onTap: () {
+                                                                                context.pushNamed('guest_info', extra: {
+                                                                                  'is_register_guest': true
+                                                                                });
+                                                                              },
+                                                                              child: TimeView(
+                                                                                bgColor: AppColors.colorLightGray,
+                                                                                hour: "$visibleTime:00",
+                                                                                textColor: AppColors.colorGray,
+                                                                              ),
+                                                                            );
+                                                                          } else {
+                                                                            return GestureDetector(
+                                                                              onTap: () {
+                                                                                context.pushNamed('guest_info', extra: {
+                                                                                  'is_register_guest': true
+                                                                                });
+                                                                              },
+                                                                              child: DateView(
+                                                                                bgColor: AppColors.colorLightGray,
+                                                                                day: visibleDate!.day.toString(),
+                                                                                textColor: AppColors.colorGray,
+                                                                                weekDay: shortWeekDays[visibleDate!.weekday - 1],
+                                                                              ),
+                                                                            );
+                                                                          }
+                                                                        } else {
+                                                                          bool isSelectedDayAfter = selectedDay
+                                                                              .value
+                                                                              .add(const Duration(days: 1))
+                                                                              .isAfter(selectedDay.value);
+                                                                          bool isContinue = isCalendarDayView == true
+                                                                              ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
+                                                                              : (startEndDiffTimes.isNotEmpty ? isSelectedDayAfter : false);
+
+                                                                          double
+                                                                              getAppointmentWidth() {
+                                                                            List<DateTime> _startEndDiff = isCalendarDayView == true
+                                                                                ? startEndDiffDates
+                                                                                : startEndDiffTimes;
+                                                                            int diffDatesAfterLastDate =
+                                                                                _startEndDiff.where((e) {
+                                                                              if (isCalendarDayView == true) {
+                                                                                return e.isAfter(_visibleDates.last);
+                                                                              } else {
+                                                                                return e.isAfter(selectedDay.value);
+                                                                              }
+                                                                            }).length;
+                                                                            double
+                                                                                width =
+                                                                                appointmentSize;
+
+                                                                            width = width +
+                                                                                (_startEndDiff.isNotEmpty ? (appointmentSize * _startEndDiff.length) + (_startEndDiff.length) * 6 : 0) -
+                                                                                (isContinue == true ? (diffDatesAfterLastDate * 46) + (diffDatesAfterLastDate * 6) : 0);
+                                                                            return width;
+                                                                          }
+
+                                                                          // final _listAppointments = isCalendarDayView == true
+                                                                          //     ? currentResourceApointments
+                                                                          //     : currentResourceApointments;
+                                                                          return SizedBox(
+                                                                            width:
+                                                                                getAppointmentWidth(),
+                                                                            child:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                context.pushNamed('guest_info', extra: {
+                                                                                  'info': currentResourceApointments[reducedAppointmentIndex].toMap()
+                                                                                });
+                                                                              },
+                                                                              child: AppointmentViewWidget(
+                                                                                borderRadius: BorderRadius.circular(12).copyWith(bottomRight: Radius.circular(isContinue ? 0 : 12), topRight: Radius.circular(isContinue ? 0 : 12)),
+                                                                                appointment: currentResourceApointments[reducedAppointmentIndex],
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        }
+                                                                      }
+                                                                      return kSBW6;
+                                                                    })),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 82)
+                                                          ],
+                                                        ))
+                                                      ]),
+                                                ),
+                                              ),
+                                            ),
+                                            onNotification: (ScrollNotification
+                                                scrollInfo) {
+                                              _syncScroller?.processNotification(
+                                                  scrollInfo,
+                                                  appointmentsVertController);
+                                              return true;
+                                            }),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
                         ///
-                        ///Нижние даты с записями
+                        ///RESOURCES BAR
                         ///
-                        NotificationListener<ScrollNotification>(
-                            child: Flexible(
-                              child: NotificationListener<
-                                  OverscrollIndicatorNotification>(
-                                onNotification: (OverscrollIndicatorNotification
-                                    overscroll) {
-                                  overscroll.disallowIndicator();
-                                  return false;
-                                },
-                                child: SizedBox(
-                                  height: (listResources.length * 92) + 82,
-                                  width: _visibleDates.length * 52,
-                                  child: CustomScrollView(
-                                      controller: appointmentsVertController,
-                                      slivers: [
-                                        SliverList(
-                                            delegate: SliverChildListDelegate(
-                                          [
-                                            Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: List.generate(
+                        Positioned(
+                          top: 82,
+                          bottom: 0,
+                          left: 0,
+                          width: 89,
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (ScrollNotification scrollInfo) {
+                              _syncScroller?.processNotification(
+                                  scrollInfo, _resourcesVertController);
+                              return true;
+                            },
+                            child: NotificationListener<
+                                OverscrollIndicatorNotification>(
+                              onNotification:
+                                  (OverscrollIndicatorNotification overscroll) {
+                                overscroll.disallowIndicator();
+                                return false;
+                              },
+                              child: SizedBox(
+                                width: 89,
+                                child: CustomScrollView(
+                                  controller: _resourcesVertController,
+                                  slivers: [
+                                    SliverList(
+                                      delegate: SliverChildListDelegate(
+                                        [
+                                          Column(
+                                            children: List.generate(
                                                 listResources.length,
-                                                (columnIndex) {
-                                                  appointmentIndex = 0;
-
-                                                  ///currentResourceApointments Записи гостей у текущего ряда
-                                                  List<GuestModel>
-                                                      currentResourceApointments =
-                                                      [];
-
-                                                  ///resource Текущий ряд
-                                                  ObjectToBook? resource =
-                                                      listResources[
-                                                          columnIndex];
-
-                                                  ///allResourcesDates Список дат для каждого ряда
-                                                  List<List<DateTime>>
-                                                      allResourcesDates =
-                                                      List.generate(
-                                                          (listResources
-                                                                  .isNotEmpty
-                                                              ? listResources
-                                                                  .length
-                                                              : 0),
-                                                          (index) => [
-                                                                ..._visibleDates
-                                                              ]);
-
-                                                  ///currentResourceDates Даты для текущего ряда
-                                                  List<DateTime>
-                                                      currentResourceDates =
-                                                      allResourcesDates[
-                                                          columnIndex];
-
-                                                  ///Добавляем записи гостей в список
-                                                  currentResourceApointments
-                                                      .addAll(listAppointment
-                                                          .where((a) =>
-                                                              a.resourceId ==
-                                                              resource.id));
-
-                                                  ///Сортируем по дате
-                                                  currentResourceApointments
-                                                      .sort((a, b) => a
-                                                          .startDate!
-                                                          .compareTo(
-                                                              b.startDate!));
-
-                                                  // if (currentResourceApointments
-                                                  // .isNotEmpty
-                                                  // &&
-                                                  // appointmentIndex <
-                                                  //     currentResourceApointments
-                                                  //         .length
-                                                  // ) {
-                                                  // startDate = currentResourceApointments[
-                                                  //         appointmentIndex ==
-                                                  //                 0
-                                                  //             ? appointmentIndex
-                                                  //             : appointmentIndex -
-                                                  //                 1]
-                                                  //     .startDate!;
-                                                  // startEndDiffDates =
-                                                  //     currentResourceApointments
-                                                  //             .isEmpty
-                                                  //         ? []
-                                                  //         : getDatesAfterStartDateBeforeEnd(
-                                                  //             startDate!,
-                                                  //             currentResourceApointments[appointmentIndex ==
-                                                  //                         0
-                                                  //                     ? appointmentIndex
-                                                  //                     : appointmentIndex -
-                                                  //                         1]
-                                                  //                 .endDate!,
-                                                  //           );
-                                                  // for (var r
-                                                  //     in allResourcesDates) {
-                                                  // appointmentIndex = 0;
-                                                  // for (int currentResourceDatesIndex =
-                                                  //         0;
-                                                  //     currentResourceDatesIndex <
-                                                  //         allResourcesDates
-                                                  //             .length;
-                                                  //     currentResourceDatesIndex++) {
-
-                                                  ///Делаем цикл для получения индекса дат для текущего ряда
-                                                  for (int i = 0;
-                                                      i <
-                                                          currentResourceDates
-                                                              .length;
-                                                      i++) {
-                                                    ///Помечаем пустым чтобы они не складывались
-                                                    startEndDiffDates = [];
-                                                    visibleDate =
-                                                        currentResourceDates[i];
-
-                                                    ///Если записи гостей в текущем ряду не пусты
-                                                    if (currentResourceApointments
-                                                        .isNotEmpty) {
-                                                      ///Делаем цикл для получения записи гостя
-                                                      for (var apointment
-                                                          in currentResourceApointments) {
-                                                        ///Если дата заезда гостя и текущая дата совпадают
-                                                        if (isSameDate(
-                                                            apointment
-                                                                .startDate,
-                                                            visibleDate)) {
-                                                          startEndDiffDates =
-                                                              currentResourceApointments
-                                                                      .isEmpty
-                                                                  ? []
-                                                                  : getDatesAfterStartDateBeforeEnd(
-                                                                      apointment
-                                                                          .startDate!,
-                                                                      apointment
-                                                                          .endDate!,
-                                                                    );
-                                                        }
-
-                                                        // }
-                                                        // if (currentResourceApointments
-                                                        //         .isNotEmpty &&
-                                                        //     appointmentIndex <
-                                                        //         currentResourceApointments
-                                                        //             .length) {
-                                                        // startDate = currentResourceApointments[
-                                                        //         appointmentIndex ==
-                                                        //                 0
-                                                        //             ? appointmentIndex
-                                                        //             : appointmentIndex]
-                                                        //     .startDate!;
-                                                        // final isSameStartVisibleDate =
-                                                        //     isSameDate(
-                                                        //         startDate,
-                                                        //         visibleDate);
-                                                        // if (isSameStartVisibleDate ==
-                                                        //     true) {
-                                                        //   // previusDate =
-                                                        //   //     visibleDate;
-                                                        //   appointmentIndex++;
-                                                        // }
-                                                        // startEndDiffDates =
-                                                        //     currentResourceApointments
-                                                        //             .isEmpty
-                                                        //         ? []
-                                                        //         : getDatesAfterStartDateBeforeEnd(
-                                                        //             startDate!,
-                                                        //             currentResourceApointments[appointmentIndex ==
-                                                        //                         0
-                                                        //                     ? appointmentIndex
-                                                        //                     : appointmentIndex]
-                                                        //                 .endDate!,
-                                                        //           );
-
-                                                        // if (startEndDiffDates
-                                                        //     .isNotEmpty) {
-                                                        //   r.removeWhere((e) {
-                                                        //     if (startEndDiffDates
-                                                        //         .contains(e)) {
-                                                        //       return true;
-                                                        //     }
-                                                        //     return false;
-                                                        //   });
-                                                        //   // }
-                                                        // }
-
-                                                        // startEndDiffDates =
-                                                        //     currentResourceApointments
-                                                        //             .isEmpty
-                                                        //         ? []
-                                                        //         : getDatesAfterStartDateBeforeEnd(
-                                                        //             startDate!,
-                                                        //             currentResourceApointments[
-                                                        //                     appointmentIndex == 0
-                                                        //                         ? appointmentIndex
-                                                        //                         : appointmentIndex - 1
-                                                        //                     // reducedAppointmentIndex
-                                                        //                     ]
-                                                        //                 .endDate!,
-                                                        //           );
-                                                      }
-
-                                                      ///Если даты после дня заезда до дня выезда не пусты
-                                                      if (startEndDiffDates
-                                                          .isNotEmpty) {
-                                                        ///Если в списке дат после дня заезда до дня выезда
-                                                        ///содержутся даты для отображения в текущем ряду
-                                                        allResourcesDates[
-                                                                columnIndex]
-                                                            .removeWhere((e) {
-                                                          if (startEndDiffDates
-                                                              .contains(e)) {
-                                                            return true;
-                                                          }
-                                                          return false;
-                                                        });
-                                                      }
-                                                    }
-                                                  }
-
-                                                  return Container(
-                                                    height: 92,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 3),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                            color: AppColors
-                                                                .colorWhite,
-                                                            border:
-                                                                bottomBorder),
-                                                    child: Row(
-                                                        children: List.generate(
-                                                            math.max(
-                                                                0,
-                                                                currentResourceDates
-                                                                            .length *
-                                                                        2 -
-                                                                    1),
-                                                            (index) {
-                                                      final itemIndex =
-                                                          index ~/ 2;
-                                                      if (index.isEven) {
-                                                        // final
-                                                        visibleDate =
-                                                            currentResourceDates[
-                                                                itemIndex];
-                                                        // bool?
-                                                        // isSameStartVisibleDate;
-                                                        // final List<DateTime>
-                                                        //     listDatesForRow =
-                                                        // _visibleDates;
-                                                        // final nextVisDate =
-                                                        //     _visibleDates[datesIndex ==
-                                                        //             _visibleDates
-                                                        //                     .length -
-                                                        //                 1
-                                                        //         ? datesIndex
-                                                        //         : datesIndex +
-                                                        //             1];
-                                                        // final prevVisDate =
-                                                        //     _visibleDates[
-                                                        //         itemIndex == 0
-                                                        //             ? itemIndex
-                                                        //             : itemIndex -
-                                                        //                 1];
-
-                                                        ///ИНДЕКС ДЛЯ ОТОБРАЖЕНИЯ КАРТОЧЕК ЗАПИСИ С ВЫЧИТАНИЕМ 1 ЭЛЕМЕНТА ДЛЯ КОРРЕКТНОГО ОТБРАЖЕНИЯ
-                                                        int reducedAppointmentIndex =
-                                                            0;
-
-                                                        ///isSameStartVisibleDate true ЕСЛИ ДАТА ЗАЕЗДА ГОСТЯ И ДАТА НА ЗАДНЕМ ФОНЕ РАВНЫ
-                                                        final isSameStartVisibleDate =
-                                                            isSameDate(
-                                                                startDate,
-                                                                visibleDate);
-                                                        if (currentResourceApointments
-                                                                .isNotEmpty &&
-                                                            appointmentIndex <
-                                                                currentResourceApointments
-                                                                    .length) {
-                                                          startDate =
-                                                              currentResourceApointments[
-                                                                      appointmentIndex]
-                                                                  .startDate!;
-
-                                                          if (isSameStartVisibleDate ==
-                                                                  true &&
-                                                              appointmentIndex <
-                                                                  currentResourceApointments
-                                                                      .length) {
-                                                            appointmentIndex++;
-                                                          }
-                                                          reducedAppointmentIndex =
-                                                              appointmentIndex ==
-                                                                      0
-                                                                  ? appointmentIndex
-                                                                  : appointmentIndex -
-                                                                      1;
-                                                          startEndDiffDates =
-                                                              currentResourceApointments
-                                                                      .isEmpty
-                                                                  ? []
-                                                                  : getDatesAfterStartDateBeforeEnd(
-                                                                      startDate!,
-                                                                      currentResourceApointments[
-                                                                              // appointmentIndex == 0 ? appointmentIndex : appointmentIndex - 1
-                                                                              reducedAppointmentIndex]
-                                                                          .endDate!,
-                                                                    );
-                                                        }
-
-                                                        final isAppointment =
-                                                            isSameStartVisibleDate ==
-                                                                    true &&
-                                                                currentResourceApointments
-                                                                    .isNotEmpty;
-
-                                                        // int daysBetween(
-                                                        //     DateTime from,
-                                                        //     DateTime to) {
-                                                        //   return (from
-                                                        //       .difference(to)
-                                                        //       .inDays);
-                                                        // }
-                                                        ///РАЗНИЦА В ДНЯХ МЕЖДУ ДАТОЙ ЗАЕЗДА И ВЫЕЗДА
-                                                        // final endStartDateDiff =
-                                                        //     currentResourceApointments
-                                                        //             .isEmpty
-                                                        //         ? 0
-                                                        //         : getDaysInBeteween(
-                                                        //             startDate!,
-                                                        //             currentResourceApointments[
-                                                        //                     reducedAppointmentIndex]
-                                                        //                 .endDate!,
-                                                        //           ).length;
-                                                        // bool
-                                                        //     isAppointmentTail() {
-                                                        // int i = 0;
-                                                        // for (int i = 0;
-                                                        //     i > departureArrivalDateDiff;
-                                                        //     i++) {
-                                                        //   if (departureArrivalDateDiff
-                                                        //               .isNegative ==
-                                                        //           false &&
-                                                        //       departureArrivalDateDiff !=
-                                                        //           0) {
-                                                        //     _isAppointmentTail =
-                                                        //         _visibleDates[
-                                                        //                 appointmentIndex +
-                                                        //                     i] ==
-                                                        //             visibleDate;
-                                                        //   }
-                                                        // }
-                                                        // if (index != 0) {
-                                                        // _visibleDates
-                                                        //     .removeWhere((a) {
-                                                        //   if (startEndDiffDates
-                                                        //           .contains(
-                                                        //               a) ==
-                                                        //       true) {
-                                                        //     // var subtractedIndex =
-                                                        //     // (datesIndex ==
-                                                        //     //         0)
-                                                        //     //     ? (datesIndex)
-                                                        //     // :
-                                                        //     // (itemIndex -
-                                                        //     // 2);
-                                                        //     // itemIndex =
-                                                        //     // subtractedIndex;
-                                                        //     return true;
-                                                        //   }
-                                                        //   return false;
-                                                        // });
-                                                        // }
-                                                        // isTail = startEndDiffDates
-                                                        //     .any((e) =>
-                                                        //         isSameDate(e,
-                                                        //             visibleDate));
-                                                        //  isSameDate(
-                                                        //       _currentViewVisibleDates[
-                                                        //           itemIndex +
-                                                        //               i],
-                                                        //       visibleDate
-                                                        //       // currentResourceApointments[appointmentIndex].
-                                                        //       );
-                                                        // }//
-                                                        // if (isTail == true &&
-                                                        //     i < endStartDateDiff) {
-                                                        //   i++;
-                                                        // }
-                                                        // }
-                                                        // return isTail;
-                                                        // }
-                                                        ///
-
-                                                        if (isAppointment ==
-                                                            false) {
-                                                          return DateView(
-                                                            bgColor: AppColors
-                                                                .colorLightGray,
-                                                            day: visibleDate!
-                                                                .day
-                                                                .toString(),
-                                                            textColor: AppColors
-                                                                .colorGray,
-                                                            weekDay: shortWeekDays[
-                                                                visibleDate!
-                                                                        .weekday -
-                                                                    1],
-                                                          );
-                                                        } else {
-                                                          final bool
-                                                              isContinue =
-                                                              startEndDiffDates
-                                                                      .isNotEmpty
-                                                                  ? startEndDiffDates
-                                                                      .last
-                                                                      .isAfter(
-                                                                          _visibleDates
-                                                                              .last)
-                                                                  : false;
-
-                                                          return SizedBox(
-                                                            width: (appointmentSize +
-                                                                    (startEndDiffDates
-                                                                            .isNotEmpty
-                                                                        ? (appointmentSize * startEndDiffDates.length) +
-                                                                            (startEndDiffDates.length) *
-                                                                                6
-                                                                        : 0)) -
-                                                                (isContinue
-                                                                    ? (startEndDiffDates.where((e) => e.isAfter(_visibleDates.last)).length *
-                                                                            46) +
-                                                                        (startEndDiffDates.where((e) => e.isAfter(_visibleDates.last)).length *
-                                                                            6)
-                                                                    : 0),
-                                                            child:
-                                                                GestureDetector(
-                                                              onTap: () {
-                                                                print(
-                                                                    "CLIP! ${Random().nextInt(99999999)}");
-                                                                context.pushNamed(
-                                                                    'guest_info',
-                                                                    extra: {
-                                                                      'info': currentResourceApointments[
-                                                                              reducedAppointmentIndex]
-                                                                          .toMap()
-                                                                    });
-                                                              },
-                                                              child:
-                                                                  AppointmentViewWidget(
-                                                                borderRadius: BorderRadius.circular(12).copyWith(
-                                                                    bottomRight:
-                                                                        Radius.circular(isContinue
-                                                                            ? 0
-                                                                            : 12),
-                                                                    topRight: Radius.circular(
-                                                                        isContinue
-                                                                            ? 0
-                                                                            : 12)),
-                                                                appointment: currentResourceApointments[
-                                                                    // appointmentIndex !=
-                                                                    //         0
-                                                                    //     ? appointmentIndex -
-                                                                    //         1
-                                                                    //     : 0
-                                                                    reducedAppointmentIndex],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                      }
-                                                      return kSBW6;
-                                                    })),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(height: 82)
-                                          ],
-                                        ))
-                                      ]),
+                                                (index) => SplashButton(
+                                                      onTap: () {
+                                                        context.pushNamed(
+                                                            'booking_object',
+                                                            extra: {
+                                                              'info':
+                                                                  listResources[
+                                                                          index]
+                                                                      .toMap()
+                                                            });
+                                                      },
+                                                      child: ResourceViewWidget(
+                                                          resource:
+                                                              listResources[
+                                                                  index]),
+                                                    )),
+                                          ),
+                                          SplashButton(
+                                            onTap: () {
+                                              context.pushNamed(
+                                                'booking_object',
+                                                // extra: {
+                                                //   'info': listResources[
+                                                //           index]
+                                                //       .toMap()
+                                                // }
+                                              );
+                                            },
+                                            child: SizedBox(
+                                                height: 82,
+                                                child: Center(
+                                                  child: SvgPicture.asset(
+                                                    height: 14,
+                                                    AppImages.plus,
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                            AppColors
+                                                                .colorDarkGray,
+                                                            BlendMode.srcIn),
+                                                  ),
+                                                )),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            onNotification: (ScrollNotification scrollInfo) {
-                              _syncScroller?.processNotification(
-                                  scrollInfo, appointmentsVertController);
-                              return true;
-                            }),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        ///
-        ///RESOURCES BAR
-        ///
-        Positioned(
-          top: 82,
-          bottom: 0,
-          left: 0,
-          width: 89,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              _syncScroller?.processNotification(
-                  scrollInfo, _resourcesVertController);
-              return true;
-            },
-            child: NotificationListener<OverscrollIndicatorNotification>(
-              onNotification: (OverscrollIndicatorNotification overscroll) {
-                overscroll.disallowIndicator();
-                return false;
-              },
-              child: SizedBox(
-                width: 89,
-                child: CustomScrollView(
-                  controller: _resourcesVertController,
-                  slivers: [
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          Column(
-                            children: List.generate(
-                                listResources.length,
-                                (index) => ResourceViewWidget(
-                                    resource: listResources[index])),
                           ),
-                          SplashButton(
-                            onTap: () {},
-                            child: SizedBox(
-                                height: 82,
-                                child: Center(
-                                  child: SvgPicture.asset(
-                                    height: 14,
-                                    AppImages.plus,
-                                    colorFilter: const ColorFilter.mode(
-                                        AppColors.colorDarkGray,
-                                        BlendMode.srcIn),
-                                  ),
-                                )),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+                        ),
 
-        ///
-        ///Calendar button
-        ///
-        Positioned(
-          left: 0,
-          top: 0,
-          child: Container(
-            height: 82,
-            width: 89,
-            clipBehavior: Clip.hardEdge,
-            decoration: const BoxDecoration(
-                color: AppColors.colorWhite,
-                border: Border(
-                    bottom: BorderSide(
-                        color: AppColors.colorLightGray,
-                        style: BorderStyle.solid,
-                        strokeAlign: BorderSide.strokeAlignInside))),
-            child: SplashButton(
-              onTap: () {},
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset(AppImages.calendar),
-                    kSBH6,
-                    Text(
-                      'Авг. 2023',
-                      style: AppTextStyle.w500s12
-                          .copyWith(color: AppColors.colorDarkGray),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    ));
+                        ///
+                        ///Calendar button
+                        ///
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          child: Container(
+                            height: 82,
+                            width: 89,
+                            clipBehavior: Clip.hardEdge,
+                            decoration: const BoxDecoration(
+                                color: AppColors.colorWhite,
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: AppColors.colorLightGray,
+                                        style: BorderStyle.solid,
+                                        strokeAlign:
+                                            BorderSide.strokeAlignInside))),
+                            child: SplashButton(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                          insetPadding: kPAll20,
+                                          backgroundColor: AppColors.colorWhite,
+                                          surfaceTintColor:
+                                              AppColors.colorWhite,
+                                          child: CustomCalendarDialog(
+                                            firstDate: DateTime(1900),
+                                            initialDate: selectedDay.value,
+                                            //  widget.guestM,
+                                            lastDate: DateTime(now.year + 10),
+                                            onDateChanged: (value) {
+                                              // startDate.text = DateFormat("dd.MM.y").format(value);
+                                              // initStartSelectedDate
+                                              setState(() {
+                                                selectedDay.value = value;
+                                              });
+                                              // startDate.text = value.toIso8601String();
+                                              //  /,
+                                            },
+                                          ),
+                                        ));
+                              },
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SvgPicture.asset(AppImages.calendar),
+                                    kSBH6,
+                                    Text(
+                                      "${middleMonth[selectedDay.value.month - 1]}. ${selectedDay.value.year}",
+                                      style: AppTextStyle.w500s12.copyWith(
+                                          color: AppColors.colorDarkGray),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+            }));
 
     // SafeArea(
     //   child: Stack(children: <Widget>[

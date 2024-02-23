@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_chip.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
@@ -11,7 +12,8 @@ import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'dart:math' as math;
 
 class BookingObjectPage extends StatefulWidget {
-  const BookingObjectPage({super.key});
+  const BookingObjectPage({super.key, this.objectToBook});
+  final ObjectToBook? objectToBook;
 
   @override
   State<BookingObjectPage> createState() => _BookingObjectPageState();
