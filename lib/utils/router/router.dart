@@ -11,6 +11,7 @@ import 'package:qaz_booking_ui/ui/pages/auth_page/auth_page.dart';
 import 'package:qaz_booking_ui/ui/pages/booking_object_page/booking_object_page.dart';
 import 'package:qaz_booking_ui/ui/pages/information_page/information_page.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/main_page.dart';
+import 'package:qaz_booking_ui/ui/pages/more_services_page/more_services_page.dart';
 import 'package:qaz_booking_ui/ui/pages/objects_for_booking_page/objects_for_booking_page.dart';
 import 'package:qaz_booking_ui/ui/pages/guest_info_page/guest_info_page.dart';
 import 'package:qaz_booking_ui/ui/pages/profile_page/profile_page.dart';
@@ -57,8 +58,21 @@ class AppRouter {
         GoRoute(
           path: '/main',
           pageBuilder: (context, state) {
-            return CupertinoPage(
-                child: MainPage(routeState: state), key: state.pageKey);
+            Map<String, dynamic>? map = state.extra as Map<String, dynamic>?;
+            if (map?["is_cupertino_animation"] == true) {
+              return CupertinoPage(
+                  child: MainPage(routeState: state), key: state.pageKey);
+            } else {
+              return FadeTransitionPage(
+                  child: MainPage(routeState: state), key: state.pageKey);
+            }
+          },
+        ),
+        GoRoute(
+          path: '/more_services',
+          pageBuilder: (context, state) {
+            return FadeTransitionPage(
+                child: MoreServicesPage(routeState: state), key: state.pageKey);
           },
         ),
         GoRoute(
@@ -84,6 +98,7 @@ class AppRouter {
             Map<String, dynamic>? map = state.extra as Map<String, dynamic>?;
             return FadeTransitionPage(
                 child: BookingObjectPage(
+                    isNewObjectPage: map?['is_new_object'],
                     objectToBook: map?['info'] == null
                         ? null
                         : ObjectToBook.fromMap(map?['info'])),

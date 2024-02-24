@@ -3,6 +3,7 @@ import 'package:qaz_booking_ui/model/guest_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/ui/widgets/lib/calendar.dart';
+import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 
 class AppointmentViewWidget extends StatelessWidget {
@@ -30,7 +31,7 @@ class AppointmentViewWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         decoration: BoxDecoration(
             color: appointment.color,
-            borderRadius: borderRadius ?? BorderRadius.circular(12)),
+            borderRadius: borderRadius ?? allCircularRadius12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({
@@ -32,7 +33,7 @@ class CustomButton extends StatelessWidget {
               ? highlightColor ?? AppColors.colorBlue.withOpacity(0.2)
               : highlightColor ?? AppColors.colorWhite.withOpacity(0.15),
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              const RoundedRectangleBorder(borderRadius: allCircularRadius12),
           backgroundColor: bgColor!,
           elevation: 0,
           fixedSize: Size(width!, height!),

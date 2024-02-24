@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/hour_view.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/saved_guest_card.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/time_view_card.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_calendar_dialog.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 import 'package:qaz_booking_ui/model/guest_model.dart';
@@ -11,8 +12,8 @@ import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/appointment_view.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/resource_view.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view_card.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/resource_view_card.dart';
 import 'package:qaz_booking_ui/ui/widgets/lib/src/calendar/common/date_time_engine.dart';
 import 'package:qaz_booking_ui/ui/widgets/splash_button.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
@@ -539,7 +540,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                         visibleDate?.year ==
                                                             now.year;
 
-                                                return DateView(
+                                                return DateViewCard(
                                                   bgColor: isToday
                                                       ? AppColors.colorBlue
                                                       : AppColors
@@ -561,7 +562,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                     visibleTimes[itemIndex] ==
                                                         now.hour;
 
-                                                return TimeView(
+                                                return TimeViewCard(
                                                   bgColor: isCurrenTime
                                                       ? AppColors.colorBlue
                                                       : AppColors
@@ -731,9 +732,8 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                         for (var apointment
                                                                             in currentResourceApointments) {
                                                                           ///Если дата заезда гостя и текущая дата совпадают
-                                                                          if (isSameDate(
-                                                                              apointment.startDate,
-                                                                              visibleDate)) {
+                                                                          if (isSameDate(apointment.startDate, visibleDate) &&
+                                                                              apointment.isSaved != true) {
                                                                             startEndDiffDates = currentResourceApointments.isEmpty
                                                                                 ? []
                                                                                 : getDatesAfterStartDateBeforeEnd(
@@ -910,7 +910,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                                   'is_register_guest': true
                                                                                 });
                                                                               },
-                                                                              child: TimeView(
+                                                                              child: TimeViewCard(
                                                                                 bgColor: AppColors.colorLightGray,
                                                                                 hour: "$visibleTime:00",
                                                                                 textColor: AppColors.colorGray,
@@ -923,7 +923,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                                   'is_register_guest': true
                                                                                 });
                                                                               },
-                                                                              child: DateView(
+                                                                              child: DateViewCard(
                                                                                 bgColor: AppColors.colorLightGray,
                                                                                 day: visibleDate!.day.toString(),
                                                                                 textColor: AppColors.colorGray,
@@ -932,56 +932,51 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                             );
                                                                           }
                                                                         } else {
-                                                                          bool isSelectedDayAfter = selectedDay
-                                                                              .value
-                                                                              .add(const Duration(days: 1))
-                                                                              .isAfter(selectedDay.value);
-                                                                          bool isContinue = isCalendarDayView == true
-                                                                              ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
-                                                                              : (startEndDiffTimes.isNotEmpty ? isSelectedDayAfter : false);
+                                                                          if (currentResourceApointments[reducedAppointmentIndex].isSaved ==
+                                                                              true) {
+                                                                            return const SavedGuestCard();
+                                                                          } else {
+                                                                            bool
+                                                                                isSelectedDayAfter =
+                                                                                selectedDay.value.add(const Duration(days: 1)).isAfter(selectedDay.value);
+                                                                            bool isContinue = isCalendarDayView == true
+                                                                                ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
+                                                                                : (startEndDiffTimes.isNotEmpty ? isSelectedDayAfter : false);
 
-                                                                          double
-                                                                              getAppointmentWidth() {
-                                                                            List<DateTime> _startEndDiff = isCalendarDayView == true
-                                                                                ? startEndDiffDates
-                                                                                : startEndDiffTimes;
-                                                                            int diffDatesAfterLastDate =
-                                                                                _startEndDiff.where((e) {
-                                                                              if (isCalendarDayView == true) {
-                                                                                return e.isAfter(_visibleDates.last);
-                                                                              } else {
-                                                                                return e.isAfter(selectedDay.value);
-                                                                              }
-                                                                            }).length;
                                                                             double
-                                                                                width =
-                                                                                appointmentSize;
+                                                                                getAppointmentWidth() {
+                                                                              List<DateTime> _startEndDiff = isCalendarDayView == true ? startEndDiffDates : startEndDiffTimes;
+                                                                              int diffDatesAfterLastDate = _startEndDiff.where((e) {
+                                                                                if (isCalendarDayView == true) {
+                                                                                  return e.isAfter(_visibleDates.last);
+                                                                                } else {
+                                                                                  return e.isAfter(selectedDay.value);
+                                                                                }
+                                                                              }).length;
+                                                                              double width = appointmentSize;
 
-                                                                            width = width +
-                                                                                (_startEndDiff.isNotEmpty ? (appointmentSize * _startEndDiff.length) + (_startEndDiff.length) * 6 : 0) -
-                                                                                (isContinue == true ? (diffDatesAfterLastDate * 46) + (diffDatesAfterLastDate * 6) : 0);
-                                                                            return width;
-                                                                          }
+                                                                              width = width + (_startEndDiff.isNotEmpty ? (appointmentSize * _startEndDiff.length) + (_startEndDiff.length) * 6 : 0) - (isContinue == true ? (diffDatesAfterLastDate * 46) + (diffDatesAfterLastDate * 6) : 0);
+                                                                              return width;
+                                                                            }
 
-                                                                          // final _listAppointments = isCalendarDayView == true
-                                                                          //     ? currentResourceApointments
-                                                                          //     : currentResourceApointments;
-                                                                          return SizedBox(
-                                                                            width:
-                                                                                getAppointmentWidth(),
-                                                                            child:
-                                                                                GestureDetector(
-                                                                              onTap: () {
-                                                                                context.pushNamed('guest_info', extra: {
-                                                                                  'info': currentResourceApointments[reducedAppointmentIndex].toMap()
-                                                                                });
-                                                                              },
-                                                                              child: AppointmentViewWidget(
-                                                                                borderRadius: BorderRadius.circular(12).copyWith(bottomRight: Radius.circular(isContinue ? 0 : 12), topRight: Radius.circular(isContinue ? 0 : 12)),
-                                                                                appointment: currentResourceApointments[reducedAppointmentIndex],
+                                                                            // final _listAppointments = isCalendarDayView == true
+                                                                            //     ? currentResourceApointments
+                                                                            //     : currentResourceApointments;
+                                                                            return SizedBox(
+                                                                              width: getAppointmentWidth(),
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  context.pushNamed('guest_info', extra: {
+                                                                                    'info': currentResourceApointments[reducedAppointmentIndex].toMap()
+                                                                                  });
+                                                                                },
+                                                                                child: AppointmentViewWidget(
+                                                                                  borderRadius:allCircularRadius12.copyWith(bottomRight: Radius.circular(isContinue ? 0 : 12), topRight: Radius.circular(isContinue ? 0 : 12)),
+                                                                                  appointment: currentResourceApointments[reducedAppointmentIndex],
+                                                                                ),
                                                                               ),
-                                                                            ),
-                                                                          );
+                                                                            );
+                                                                          }
                                                                         }
                                                                       }
                                                                       return kSBW6;
@@ -1057,7 +1052,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                       .toMap()
                                                             });
                                                       },
-                                                      child: ResourceViewWidget(
+                                                      child: ResourceViewCard(
                                                           resource:
                                                               listResources[
                                                                   index]),
@@ -1066,13 +1061,10 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                           SplashButton(
                                             onTap: () {
                                               context.pushNamed(
-                                                'booking_object',
-                                                // extra: {
-                                                //   'info': listResources[
-                                                //           index]
-                                                //       .toMap()
-                                                // }
-                                              );
+                                                  'booking_object',
+                                                  extra: {
+                                                    'is_new_object': true
+                                                  });
                                             },
                                             child: SizedBox(
                                                 height: 82,
@@ -1167,269 +1159,6 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                     );
                   });
             }));
-
-    // SafeArea(
-    //   child: Stack(children: <Widget>[
-    //     Positioned(
-    //       top: 0,
-    //       left: 0,
-    //       right: 0,
-    //       height: 82,
-    //       child: Container(
-    //         color: AppColors.colorGray,
-    //         child: _getTimelineViewHeader(),
-    //       ),
-    //     ),
-    //     Positioned(
-    //       left: 0,
-    //       width: 89,
-    //       top: 82,
-    //       // bottom: 0,
-    //       child: MouseRegion(
-    //         // onEnter: (PointerEnterEvent event) {
-    //         //   _pointerEnterEvent(event, false, isRTL, null,
-    //         //       top + widget.headerHeight, 0, isResourceEnabled);
-    //         // },
-    //         // onExit: _pointerExitEvent,
-    //         // onHover: (PointerHoverEvent event) {
-    //         //   _pointerHoverEvent(event, false, isRTL, null,
-    //         //       top + widget.headerHeight, 0, isResourceEnabled);
-    //         // },
-    //         child: GestureDetector(
-    //           child: ScrollConfiguration(
-    //             behavior:
-    //                 ScrollConfiguration.of(context).copyWith(scrollbars: false),
-    //             child: ListView.builder(
-    //               clipBehavior: Clip.hardEdge,
-    //               shrinkWrap: true,
-    //               itemCount: listResources.length,
-    //               itemBuilder: (context, index) {
-    //                 final resourceStyle = AppTextStyle.w500s10.copyWith(
-    //                     height: 12.0.toFigmaHeight(10),
-    //                     color: AppColors.colorDarkGray);
-    //                 return Container(
-    //                   constraints: const BoxConstraints(minHeight: 92),
-    //                   decoration: const BoxDecoration(
-    //                       color: AppColors.colorWhite, border: bottomBorder),
-    //                   padding: const EdgeInsets.symmetric(
-    //                       horizontal: 18, vertical: 12),
-    //                   child: Column(
-    //                     mainAxisSize: MainAxisSize.min,
-    //                     crossAxisAlignment: CrossAxisAlignment.start,
-    //                     children: <Widget>[
-    //                       SvgPicture.asset(
-    //                         AppImages.bed,
-    //                         colorFilter: const ColorFilter.mode(
-    //                             AppColors.colorDarkGray, BlendMode.srcIn),
-    //                       ),
-    //                       kSBH4,
-    //                       Text(listResources[index].objectName!,
-    //                           style: resourceStyle),
-    //                       kSBH2,
-    //                       Text(listResources[index].object!,
-    //                           style: resourceStyle),
-    //                       kSBH2,
-    //                       Text("${listResources[index].roomsCount!} персоны",
-    //                           style: resourceStyle),
-    //                     ],
-    //                   ),
-    //                 );
-    //               },
-    //               padding: EdgeInsets.zero,
-    //               physics: const ClampingScrollPhysics(),
-    //               controller: _resourcePanelScrollController,
-    //               // children: <Widget>[
-    //               // ResourceViewWidget(
-    //               //     _resourceCollection,
-    //               //     widget.resourceViewSettings,
-    //               //     resourceItemHeight,
-    //               //     widget.cellBorderColor,
-    //               //     _calendarTheme,
-    //               //     _themeData,
-    //               //     _resourceImageNotifier,
-    //               //     isRTL,
-    //               //     _textScaleFactor,
-    //               //     _resourceHoverNotifier.value,
-    //               //     _imagePainterCollection,
-    //               //     resourceViewSize,
-    //               //     panelHeight,
-    //               //     widget.resourceViewHeaderBuilder),
-    //               // ]
-    //             ),
-    //           ),
-    //           // onTapUp: (TapUpDetails details) {
-    //           //   _handleOnTapForResourcePanel(details, resourceItemHeight);
-    //           // },
-    //           // onLongPressStart: (LongPressStartDetails details) {
-    //           //   _handleOnLongPressForResourcePanel(details, resourceItemHeight);
-    //           // },
-    //         ),
-    //       ),
-    //     ),
-    //     // Positioned(
-    //     //   top: 82,
-    //     //   left: 0,
-    //     //   right: 0,
-    //     //   height: 82,
-    //     //   child: ListView(
-    //     //     padding: EdgeInsets.zero,
-    //     //     controller: _timelineRulerController,
-    //     //     scrollDirection: Axis.horizontal,
-    //     //     physics: const _CustomNeverScrollableScrollPhysics(),
-    //     //     children: <Widget>[
-    //     //       _getTimelineViewHeader(),
-    //     //     ],
-    //     //   ),
-    //     //   // Scrollbar(
-    //     //   //   controller: _scrollController,
-    //     //   //   thumbVisibility: !true,
-    //     //   //   child: Container(
-    //     //   //     color: AppColors.colorGray,
-    //     //   //     child: _getTimelineViewHeader(),
-    //     //   //   ),
-    //     //   // ),
-    //     // ),
-    //     Positioned(
-    //       left: 0,
-    //       top: 0,
-    //       child: Container(
-    //         height: 82,
-    //         width: 89,
-    //         clipBehavior: Clip.hardEdge,
-    //         decoration: const BoxDecoration(
-    //             color: AppColors.colorWhite, border: bottomBorder),
-    //         child: Center(
-    //           child: Column(
-    //             mainAxisAlignment: MainAxisAlignment.center,
-    //             crossAxisAlignment: CrossAxisAlignment.start,
-    //             children: [
-    //               SvgPicture.asset(AppImages.calendar),
-    //               kSBH6,
-    //               Text(
-    //                 'Авг. 2023',
-    //                 style: AppTextStyle.w500s12
-    //                     .copyWith(color: AppColors.colorDarkGray),
-    //               )
-    //             ],
-    //           ),
-    //         ),
-    //         // ),
-    //         // ],
-    //       ),
-    //     ),
-    //     Positioned(
-    //         top: 82,
-    //         left: 0,
-    //         right: 0,
-    //         height: 18,
-    //         child: ListView(
-    //           padding: EdgeInsets.zero,
-    //           controller: _timelineRulerController,
-    //           scrollDirection: Axis.horizontal,
-    //           physics: const _CustomNeverScrollableScrollPhysics(),
-    //           children: <Widget>[
-    //             // RepaintBoundary(
-    //             //     child: CustomPaint(
-    //             //   painter: _TimeRulerView(
-    //             //       _horizontalLinesCount!,
-    //             //       _timeIntervalHeight,
-    //             //       widget.calendar.timeSlotViewSettings,
-    //             //       widget.calendar.cellBorderColor,
-    //             //       _isRTL,
-    //             //       locale,
-    //             //       widget.calendarTheme,
-    //             //       CalendarViewHelper.isTimelineView(widget.view),
-    //             //       widget.visibleDates,
-    //             //       widget.textScaleFactor),
-    //             //   size: Size(width, timeLabelSize),
-    //             // )),
-    //           ],
-    //         )),
-    //     Positioned(
-    //         top: 82,
-    //         left: 0,
-    //         right: 0,
-    //         bottom: 0,
-    //         child: Scrollbar(
-    //           controller: _scrollController,
-    //           thumbVisibility: !true,
-    //           child: ListView(
-    //               padding: EdgeInsets.zero,
-    //               controller: _scrollController,
-    //               scrollDirection: Axis.horizontal,
-    //               physics: const _CustomNeverScrollableScrollPhysics(),
-    //               children: <Widget>[
-    //                 SizedBox(
-    //                     width: context.width,
-    //                     child: Stack(children: <Widget>[
-    //                       Scrollbar(
-    //                           controller: _timelineViewVerticalScrollController,
-    //                           thumbVisibility: !true,
-    //                           child: ListView(
-    //                               padding: EdgeInsets.zero,
-    //                               controller:
-    //                                   _timelineViewVerticalScrollController,
-    //                               physics: ClampingScrollPhysics(),
-    //                               children: <Widget>[
-    //                                 Stack(children: <Widget>[
-    //                                   Row(
-    //                                     children: List.generate(
-    //                                         10,
-    //                                         (index) => Text(
-    //                                             '_getTimelineViewHeader _getTimelineViewHeader _getTimelineViewHeader ')),
-    //                                   )
-    //                                   // RepaintBoundary(
-    //                                   //     child:
-    //                                   //      _CalendarMultiChildContainer(
-    //                                   //   width: width,
-    //                                   //   height: height,
-    //                                   //   children: <Widget>[
-    //                                   //     RepaintBoundary(
-    //                                   //         child: TimelineWidget(
-    //                                   //             _horizontalLinesCount!,
-    //                                   //             widget.visibleDates,
-    //                                   //             widget.calendar
-    //                                   //                 .timeSlotViewSettings,
-    //                                   //             _timeIntervalHeight,
-    //                                   //             widget.calendar.cellBorderColor,
-    //                                   //             _isRTL,
-    //                                   //             widget.calendarTheme,
-    //                                   //             widget.themeData,
-    //                                   //             _calendarCellNotifier,
-    //                                   //             _scrollController!,
-    //                                   //             widget.regions,
-    //                                   //             resourceItemHeight,
-    //                                   //             widget.resourceCollection,
-    //                                   //             widget.textScaleFactor,
-    //                                   //             widget.isMobilePlatform,
-    //                                   //             widget
-    //                                   //                 .calendar.timeRegionBuilder,
-    //                                   //             width,
-    //                                   //             height,
-    //                                   //             widget.minDate,
-    //                                   //             widget.maxDate,
-    //                                   //             widget.blackoutDates)),
-    //                                   // RepaintBoundary(
-    //                                   //     child: _addAppointmentPainter(width,
-    //                                   //         height, resourceItemHeight)),
-    //                                   //   ],
-    //                                   // )),
-    //                                   // RepaintBoundary(
-    //                                   //   child: CustomPaint(
-    //                                   //     painter: _addSelectionView(
-    //                                   //         resourceItemHeight),
-    //                                   //     size: Size(width, height),
-    //                                   //   ),
-    //                                   // ),
-    //                                   // _getCurrentTimeIndicator(
-    //                                   // timeLabelSize, width, height, true),
-    //                                 ]),
-    //                               ])),
-    //                     ])),
-    //               ]),
-    //         )),
-    //   ]),
-    // );
   }
 }
 

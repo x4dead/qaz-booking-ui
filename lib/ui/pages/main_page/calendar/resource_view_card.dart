@@ -7,8 +7,8 @@ import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
-class ResourceViewWidget extends StatelessWidget {
-  const ResourceViewWidget({super.key, required this.resource});
+class ResourceViewCard extends StatelessWidget {
+  const ResourceViewCard({super.key, required this.resource});
   final ObjectToBook resource;
 
   @override

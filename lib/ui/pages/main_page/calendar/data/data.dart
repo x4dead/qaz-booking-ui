@@ -146,6 +146,7 @@ final listAppointment = [
     guestFullname: 'Екатерина',
   ),
   GuestModel(
+    isSaved: true,
     startDate: now.add(const Duration(days: 2)),
     resourceId: '0002',
     endDate: now.add(const Duration(days: 3)),

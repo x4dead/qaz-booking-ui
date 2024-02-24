@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
-import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 

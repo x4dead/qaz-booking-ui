@@ -48,6 +48,7 @@ const bottomBorder = Border(
         color: AppColors.colorLightGray,
         width: 1,
         strokeAlign: BorderSide.strokeAlignInside));
+const allCircularRadius12 = BorderRadius.all(Radius.circular(12));
 
 const List<(String, String)> menuButtons = [
   (AppImages.main, 'Главная'),

@@ -12,8 +12,10 @@ import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'dart:math' as math;
 
 class BookingObjectPage extends StatefulWidget {
-  const BookingObjectPage({super.key, this.objectToBook});
+  const BookingObjectPage(
+      {super.key, this.objectToBook, this.isNewObjectPage = false});
   final ObjectToBook? objectToBook;
+  final bool? isNewObjectPage;
 
   @override
   State<BookingObjectPage> createState() => _BookingObjectPageState();
@@ -52,8 +54,8 @@ class _BookingObjectPageState extends State<BookingObjectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
-      appBar: const CustomAppBar(
-        title: 'Комната 2',
+      appBar: CustomAppBar(
+        title: widget.isNewObjectPage == true ? 'Новый объект' : 'Комната 2',
       ),
       body: SingleChildScrollView(
         child: Padding(

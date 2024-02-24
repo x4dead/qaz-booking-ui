@@ -1,9 +1,10 @@
 ﻿import 'package:flutter/cupertino.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 
-class DateView extends StatelessWidget {
-  const DateView(
+class DateViewCard extends StatelessWidget {
+  const DateViewCard(
       {super.key,
       required this.bgColor,
       required this.weekDay,
@@ -19,7 +20,7 @@ class DateView extends StatelessWidget {
       height: 46,
       width: 46,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12), color: bgColor),
+          borderRadius: allCircularRadius12, color: bgColor),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -11,7 +11,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view_card.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
@@ -11405,7 +11405,7 @@ class _CalendarViewState extends State<_CalendarView>
               visibleDate.month == now.month &&
               visibleDate.year == now.year;
 
-          return DateView(
+          return DateViewCard(
             bgColor: isToday ? AppColors.colorBlue : AppColors.colorLightGray,
             day: visibleDate.day.toString(),
             textColor: isToday ? AppColors.colorWhite : AppColors.colorDarkGray,

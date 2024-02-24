@@ -54,7 +54,8 @@ class _AuthPageState extends State<AuthPage> {
               padding: kPH20,
               child: CustomButton(
                 buttonText: 'Далее',
-                onTap: () => context.go('/main'),
+                onTap: () => context
+                    .go('/main', extra: {"is_cupertino_animation": true}),
               ),
             ),
             kSBH100,

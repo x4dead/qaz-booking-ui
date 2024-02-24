@@ -16,9 +16,9 @@ class CustomChip extends StatelessWidget {
       ),
       labelPadding: kPZero,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(
+      shape: const RoundedRectangleBorder(
+        borderRadius: allCircularRadius12,
+        side: BorderSide(
             color: AppColors.colorGray,
             strokeAlign: BorderSide.strokeAlignInside),
       ),

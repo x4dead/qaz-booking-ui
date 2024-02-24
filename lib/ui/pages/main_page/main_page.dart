@@ -1,24 +1,12 @@
-﻿import 'dart:async';
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:qaz_booking_ui/model/guest_model.dart';
-import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
-import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/appointment_view.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/calendar_view_widget.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view.dart';
 import 'package:qaz_booking_ui/ui/widgets/drawer_menu.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
 import 'package:qaz_booking_ui/ui/widgets/lib/calendar.dart';
-import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
-import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
 // class BookingDataSource extends CalendarDataSource {

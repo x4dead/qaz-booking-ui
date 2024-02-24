@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 class GuestModel {
+  final bool? isSaved;
   final DateTime? startDate;
   final String? startTime;
   final DateTime? endDate;
@@ -22,6 +23,7 @@ class GuestModel {
   final String? resourceId;
 
   const GuestModel({
+    this.isSaved,
     this.resourceId,
     this.startDate,
     this.startTime,
@@ -42,6 +44,7 @@ class GuestModel {
   });
 
   GuestModel copyWith({
+    bool? isSaved,
     DateTime? startDate,
     String? startTime,
     DateTime? endDate,
@@ -60,6 +63,7 @@ class GuestModel {
     String? comment,
   }) =>
       GuestModel(
+        isSaved: isSaved ?? this.isSaved,
         startDate: startDate ?? this.startDate,
         startTime: startTime ?? this.startTime,
         endDate: endDate ?? this.endDate,
@@ -80,6 +84,7 @@ class GuestModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'isSaved': isSaved,
       'startDate': startDate?.millisecondsSinceEpoch,
       'startTime': startTime,
       'endDate': endDate?.millisecondsSinceEpoch,
@@ -102,6 +107,7 @@ class GuestModel {
 
   factory GuestModel.fromMap(Map<String, dynamic> map) {
     return GuestModel(
+      isSaved: map['isSaved'] != null ? map['isSaved'] as bool : null,
       startDate: map['startDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['startDate'] as int)
           : null,

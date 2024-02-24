@@ -1,9 +1,10 @@
 ﻿import 'package:flutter/cupertino.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
+import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 
-class TimeView extends StatelessWidget {
-  const TimeView(
+class TimeViewCard extends StatelessWidget {
+  const TimeViewCard(
       {super.key,
       required this.bgColor,
       required this.textColor,
@@ -17,8 +18,8 @@ class TimeView extends StatelessWidget {
     return Container(
       height: 46,
       width: 46,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12), color: bgColor),
+      decoration:
+          BoxDecoration(borderRadius: allCircularRadius12, color: bgColor),
       child: Center(
         child: Text(
           hour,

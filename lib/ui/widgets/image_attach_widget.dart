@@ -18,7 +18,7 @@ class ImageAttachWidget extends StatelessWidget {
       width: 100,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: allCircularRadius12,
         color: AppColors.colorLightGray,
         image: image,
       ),
