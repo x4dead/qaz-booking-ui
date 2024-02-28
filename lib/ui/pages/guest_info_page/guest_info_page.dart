@@ -55,7 +55,7 @@ class _GuestInfoPageState extends State<GuestInfoPage> {
         ? 1
         : switch (widget.guestModel?.color) {
             AppColors.colorBlue => 0,
-            AppColors.colorBlue => 1,
+            AppColors.colorGreen => 1,
             AppColors.colorOrange => 2,
             _ => 3
           };

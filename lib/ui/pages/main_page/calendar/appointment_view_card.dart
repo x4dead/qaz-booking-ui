@@ -6,8 +6,8 @@ import 'package:qaz_booking_ui/ui/widgets/lib/calendar.dart';
 import 'package:qaz_booking_ui/utils/constants/ui_constants.dart';
 import 'package:qaz_booking_ui/utils/extentions/figma_height.dart';
 
-class AppointmentViewWidget extends StatelessWidget {
-  const AppointmentViewWidget({
+class AppointmentViewCard extends StatelessWidget {
+  const AppointmentViewCard({
     super.key,
     required this.appointment,
     this.borderRadius,

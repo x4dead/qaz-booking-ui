@@ -36,7 +36,8 @@ class ResourceViewCard extends StatelessWidget {
           kSBH2,
           Text(resource.objectType!, style: resourceStyle),
           kSBH2,
-          Text("${resource.roomsCount!} персоны", style: resourceStyle),
+          Text("${resource.roomsCount!} персоны",
+              style: resourceStyle, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
