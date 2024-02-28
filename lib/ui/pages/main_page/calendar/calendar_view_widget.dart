@@ -10,7 +10,7 @@ import 'package:qaz_booking_ui/model/guest_model.dart';
 import 'package:qaz_booking_ui/model/object_to_book_model.dart';
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/themes/text_style/text_style.dart';
-import 'package:qaz_booking_ui/ui/pages/main_page/calendar/appointment_view.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/appointment_view_card.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/data/data.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/date_view_card.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/resource_view_card.dart';
@@ -25,6 +25,15 @@ import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 enum CalendarViewEnum {
   day,
   hour,
+}
+
+enum BookedGuesEntryViewEnum {
+  start,
+  startEnd,
+  center,
+  end,
+  none,
+  date,
 }
 
 class CalendarViewWidget extends StatefulWidget {
@@ -437,11 +446,14 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
     return days;
   }
 
-  List<DateTime> getDateHours(DateTime startDate, DateTime endDate) {
+  List<DateTime> getDateHours(DateTime startDate_, DateTime endDate_) {
     List<DateTime> dates = [];
 
-    for (int i = 0; startDate.add(Duration(hours: i)).isBefore(endDate); i++) {
-      dates.add(startDate.add(Duration(hours: i)));
+    for (int i = 1;
+        startDate_.add(Duration(hours: i)).isBefore(endDate_) ||
+            startDate_.add(Duration(hours: i)).isAtSameMomentAs(endDate_);
+        i++) {
+      dates.add(startDate_.add(Duration(hours: i)));
     }
 
     return dates;
@@ -481,7 +493,7 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
               bool isCalendarDayView =
                   widget.calendarViewEnum.value == CalendarViewEnum.day;
               return ValueListenableBuilder(
-                  valueListenable: widget.calendarViewEnum,
+                  valueListenable: selectedDay,
                   builder: (context, v, child) {
                     return Stack(
                       fit: StackFit.expand,
@@ -560,7 +572,9 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                 // final now = DateTime.now();
                                                 final isCurrenTime =
                                                     visibleTimes[itemIndex] ==
-                                                        now.hour;
+                                                            now.hour &&
+                                                        isSameDate(now,
+                                                            selectedDay.value);
 
                                                 return TimeViewCard(
                                                   bgColor: isCurrenTime
@@ -695,19 +709,37 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                           resource
                                                                               .id;
                                                                     } else {
-                                                                      return selectedDay.value.day ==
-                                                                              a.startDate
-                                                                                  ?.day &&
+                                                                      final diffDates = getDatesAfterStartDateBeforeEnd(
+                                                                          a.startDate!
+                                                                              .subtract(const Duration(days: 1)),
+                                                                          a.endDate!);
+
+                                                                      final selectedDateContainsInStartEnd = diffDates.contains(DateTime(
+                                                                          selectedDay
+                                                                              .value
+                                                                              .year,
+                                                                          selectedDay
+                                                                              .value
+                                                                              .month,
+                                                                          selectedDay
+                                                                              .value
+                                                                              .day));
+                                                                      return selectedDateContainsInStartEnd &&
                                                                           a.resourceId ==
                                                                               resource.id;
                                                                     }
                                                                   }));
 
                                                                   ///Сортируем по дате
-                                                                  currentResourceApointments.sort((a, b) => a
-                                                                      .startDate!
-                                                                      .compareTo(
-                                                                          b.startDate!));
+                                                                  if (currentResourceApointments
+                                                                          .length >
+                                                                      1) {
+                                                                    currentResourceApointments.sort((a, b) => a
+                                                                        .startDate!
+                                                                        .compareTo(
+                                                                            b.startDate!));
+                                                                  }
+
                                                                   print(currentResourceApointments
                                                                       .length);
 
@@ -729,16 +761,16 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                       if (currentResourceApointments
                                                                           .isNotEmpty) {
                                                                         ///Делаем цикл для получения записи гостя
-                                                                        for (var apointment
+                                                                        for (var appointment
                                                                             in currentResourceApointments) {
                                                                           ///Если дата заезда гостя и текущая дата совпадают
-                                                                          if (isSameDate(apointment.startDate, visibleDate) &&
-                                                                              apointment.isSaved != true) {
+                                                                          if (isSameDate(appointment.startDate, visibleDate) &&
+                                                                              appointment.isSaved != true) {
                                                                             startEndDiffDates = currentResourceApointments.isEmpty
                                                                                 ? []
                                                                                 : getDatesAfterStartDateBeforeEnd(
-                                                                                    apointment.startDate!,
-                                                                                    apointment.endDate!,
+                                                                                    appointment.startDate!,
+                                                                                    appointment.endDate!,
                                                                                   );
 
                                                                             ///Если даты после дня заезда до дня выезда не пусты
@@ -773,15 +805,29 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                       if (currentResourceApointments
                                                                           .isNotEmpty) {
                                                                         ///Делаем цикл для получения записи гостя
-                                                                        for (var apointment
+                                                                        for (var appointment
                                                                             in currentResourceApointments) {
-                                                                          ///Если дата заезда гостя и текущая дата совпадают
-                                                                          if (apointment.startDate?.hour ==
-                                                                              visibleTime) {
+                                                                          final isStartSelectedDatesSame =
+                                                                              isSameDate(appointment.startDate!, selectedDay.value) && appointment.isSaved != true;
+
+                                                                          ///Если выбранная дата есть в списке дат между датой заезда и выезда
+                                                                          final appointmentStartEndDiff = getDatesAfterStartDateBeforeEnd(
+                                                                              appointment.startDate!,
+                                                                              appointment.endDate!);
+                                                                          final isStartEndDatesSame = isSameDate(appointment.startDate!, appointment.endDate!) &&
+                                                                              isStartSelectedDatesSame == true &&
+                                                                              appointment.isSaved != true;
+
+                                                                          final isEndSelectedDatesSame =
+                                                                              isSameDate(appointment.endDate!, selectedDay.value) && appointment.isSaved != true;
+                                                                          final isSelectedDateContainsInStartEnd =
+                                                                              appointmentStartEndDiff.contains(DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day)) && appointment.isSaved != true;
+                                                                          if (isStartEndDatesSame) {
+                                                                            ///Если дата заезда гостя и текущая дата совпадают
                                                                             startEndDiffTimes =
                                                                                 getDateHours(
-                                                                              apointment.startDate!,
-                                                                              apointment.endDate!,
+                                                                              appointment.startDate!,
+                                                                              appointment.endDate!,
                                                                             );
 
                                                                             ///Если даты после дня заезда до дня выезда не пусты
@@ -797,9 +843,68 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                                 });
                                                                               });
                                                                             }
+                                                                          } else if (isStartSelectedDatesSame) {
+                                                                            if (appointment.startDate?.hour ==
+                                                                                visibleTime) {
+                                                                              startEndDiffTimes = getDateHours(
+                                                                                // isEndSelectedDatesSame && !isStartEndDatesSame ? DateTime(apointment.endDate!.year, apointment.endDate!.month, apointment.endDate!.day, 23).subtract(const Duration(days: 1)) :
+                                                                                appointment.startDate!,
+                                                                                // isEndSelectedDatesSame && !isStartEndDatesSame ? apointment.endDate! :
+                                                                                DateTime(appointment.startDate!.year, appointment.startDate!.month, appointment.startDate!.day, 0).add(const Duration(days: 1)),
+                                                                              );
+
+                                                                              ///Если даты после дня заезда до дня выезда не пусты
+                                                                              if (startEndDiffTimes.isNotEmpty) {
+                                                                                ///Если в списке дат после дня заезда до дня выезда
+                                                                                ///содержутся даты для отображения в текущем ряду
+                                                                                currentResourceTimes.removeWhere((a) {
+                                                                                  return startEndDiffTimes.any((b) {
+                                                                                    if (a == b.hour && selectedDay.value.day == b.day) {
+                                                                                      return true;
+                                                                                    }
+                                                                                    return false;
+                                                                                  });
+                                                                                });
+                                                                              }
+                                                                            }
+                                                                          } else if (isEndSelectedDatesSame &&
+                                                                              !isStartEndDatesSame) {
+                                                                            startEndDiffTimes =
+                                                                                getDateHours(
+                                                                              DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day, 0),
+                                                                              appointment.endDate!,
+                                                                            );
+
+                                                                            ///Если даты после дня заезда до дня выезда не пусты
+                                                                            if (startEndDiffTimes.isNotEmpty) {
+                                                                              ///Если в списке дат после дня заезда до дня выезда
+                                                                              ///содержутся даты для отображения в текущем ряду
+                                                                              currentResourceTimes.removeWhere((a) {
+                                                                                return startEndDiffTimes.any((b) {
+                                                                                  if (a != 0 && a == b.hour && selectedDay.value.day == b.day) {
+                                                                                    return true;
+                                                                                  }
+                                                                                  return false;
+                                                                                });
+                                                                              });
+                                                                            }
+                                                                            print(currentResourceTimes.length);
+                                                                          } else if (isSelectedDateContainsInStartEnd) {
+                                                                            if (appointment.startDate?.hour ==
+                                                                                visibleTime) {
+                                                                              startEndDiffTimes = getDateHours(
+                                                                                DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day, 1),
+                                                                                DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day, 23),
+                                                                              );
+
+                                                                              ///Если даты после дня заезда до дня выезда не пусты
+                                                                              if (startEndDiffTimes.isNotEmpty) {
+                                                                                currentResourceTimes.removeRange(1, currentResourceTimes.length);
+                                                                                print(currentResourceTimes.length);
+                                                                              }
+                                                                            }
                                                                           }
                                                                         }
-                                                                        // }
                                                                       }
                                                                     }
                                                                   }
@@ -832,76 +937,114 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                         bool
                                                                             isSameStartVisibleDate =
                                                                             false;
+
+                                                                        ///isStartSelectedDatesSame проверка если дата заезда и выбранная дата равны
                                                                         bool
-                                                                            isAppointment =
+                                                                            isStartSelectedDatesSame =
                                                                             false;
+
+                                                                        ///isStartEndDatesSame проверка если дата заезда и выезда равны
+                                                                        bool
+                                                                            isStartEndDatesSame =
+                                                                            false;
+
+                                                                        ///isEndSelectedDatesSame проверка если дата выезда и выбранная дата равны
+                                                                        bool
+                                                                            isEndSelectedDatesSame =
+                                                                            false;
+                                                                        bool
+                                                                            isSelectedDateContainsInStartEnd =
+                                                                            false;
+                                                                        BookedGuesEntryViewEnum?
+                                                                            bookedGuesEntryView =
+                                                                            BookedGuesEntryViewEnum.none;
 
                                                                         if (isCalendarDayView ==
                                                                             true) {
                                                                           visibleDate =
                                                                               currentResourceDates[itemIndex];
-                                                                          isSameStartVisibleDate = isSameDate(
-                                                                              startDate,
-                                                                              visibleDate);
 
                                                                           if (currentResourceApointments.isNotEmpty &&
                                                                               appointmentIndex < currentResourceApointments.length) {
                                                                             startDate =
                                                                                 currentResourceApointments[appointmentIndex].startDate!;
 
-                                                                            if (isSameStartVisibleDate == true &&
+                                                                            if (isSameDate(currentResourceApointments[appointmentIndex].startDate, visibleDate) == true &&
                                                                                 appointmentIndex < currentResourceApointments.length) {
                                                                               appointmentIndex++;
                                                                             }
                                                                             reducedAppointmentIndex = appointmentIndex == 0
                                                                                 ? appointmentIndex
                                                                                 : appointmentIndex - 1;
-                                                                            startEndDiffDates = currentResourceApointments.isEmpty
-                                                                                ? []
-                                                                                : getDatesAfterStartDateBeforeEnd(
-                                                                                    startDate!,
-                                                                                    currentResourceApointments[
-                                                                                            // appointmentIndex == 0 ? appointmentIndex : appointmentIndex - 1
-                                                                                            reducedAppointmentIndex]
-                                                                                        .endDate!,
-                                                                                  );
-                                                                            // isAppointment =
-                                                                            //     isSameStartVisibleDate == true && currentResourceApointments.isNotEmpty;
+                                                                            startEndDiffDates =
+                                                                                getDatesAfterStartDateBeforeEnd(
+                                                                              currentResourceApointments[reducedAppointmentIndex].startDate!,
+                                                                              currentResourceApointments[reducedAppointmentIndex].endDate!,
+                                                                            );
+                                                                            if (isSameDate(currentResourceApointments[reducedAppointmentIndex].startDate, visibleDate) ==
+                                                                                true) {
+                                                                              bookedGuesEntryView = BookedGuesEntryViewEnum.startEnd;
+                                                                            } else {
+                                                                              bookedGuesEntryView = BookedGuesEntryViewEnum.date;
+                                                                            }
+                                                                          } else {
+                                                                            bookedGuesEntryView =
+                                                                                BookedGuesEntryViewEnum.date;
                                                                           }
                                                                         } else {
-                                                                          isSameStartVisibleDate =
-                                                                              startDate?.hour == visibleTime;
                                                                           visibleTime =
                                                                               currentResourceTimes[itemIndex];
-                                                                          if (currentResourceApointments.isNotEmpty &&
-                                                                              appointmentIndex < currentResourceApointments.length) {
-                                                                            startDate =
-                                                                                currentResourceApointments[appointmentIndex].startDate!;
 
-                                                                            if (isSameStartVisibleDate == true
-                                                                                // &&
-                                                                                // appointmentIndex < currentResourceApointments.length
-                                                                                ) {
-                                                                              appointmentIndex++;
+                                                                          if (currentResourceApointments
+                                                                              .isNotEmpty) {
+                                                                            for (var appointment
+                                                                                in currentResourceApointments) {
+//  isSameStartVisibleDate =
+                                                                              isStartSelectedDatesSame = isSameDate(appointment.startDate!, selectedDay.value) && appointment.isSaved != true;
+
+                                                                              ///Если выбранная дата есть в списке дат между датой заезда и выезда
+                                                                              final appointmentStartEndDiff = getDatesAfterStartDateBeforeEnd(appointment.startDate!, appointment.endDate!);
+                                                                              isSelectedDateContainsInStartEnd = appointmentStartEndDiff.contains(DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day)) && appointment.isSaved != true;
+                                                                              isStartEndDatesSame = isSameDate(appointment.startDate!, appointment.endDate!) && isStartSelectedDatesSame == true && appointment.isSaved != true;
+
+                                                                              isEndSelectedDatesSame = isSameDate(appointment.endDate!, selectedDay.value) && appointment.isSaved != true;
+                                                                              if (isStartEndDatesSame && appointment.startDate?.hour == visibleTime && bookedGuesEntryView == BookedGuesEntryViewEnum.none) {
+                                                                                ///Если дата заезда гостя и текущая дата совпадают
+                                                                                startEndDiffTimes = getDateHours(
+                                                                                  appointment.startDate!,
+                                                                                  appointment.endDate!,
+                                                                                );
+                                                                                bookedGuesEntryView = BookedGuesEntryViewEnum.startEnd;
+                                                                              } else if (isStartSelectedDatesSame && !isEndSelectedDatesSame && bookedGuesEntryView == BookedGuesEntryViewEnum.none && appointment.startDate?.hour == visibleTime) {
+                                                                                startEndDiffTimes = getDateHours(appointment.startDate!, DateTime(appointment.startDate!.year, appointment.startDate!.month, appointment.startDate!.day + 2, 0));
+                                                                                bookedGuesEntryView = BookedGuesEntryViewEnum.start;
+                                                                              } else if (isEndSelectedDatesSame && !isStartEndDatesSame && visibleTime == 0 && bookedGuesEntryView == BookedGuesEntryViewEnum.none) {
+                                                                                startEndDiffTimes = getDateHours(DateTime(appointment.endDate!.year, appointment.endDate!.month, appointment.endDate!.day, 23).subtract(const Duration(days: 1)), appointment.endDate!);
+                                                                                bookedGuesEntryView = BookedGuesEntryViewEnum.end;
+                                                                                // }
+                                                                              } else if (isSelectedDateContainsInStartEnd && !isStartSelectedDatesSame && !isEndSelectedDatesSame && bookedGuesEntryView == BookedGuesEntryViewEnum.none) {
+                                                                                startEndDiffTimes = getDateHours(
+                                                                                  DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day, 0),
+                                                                                  DateTime(selectedDay.value.year, selectedDay.value.month, selectedDay.value.day, 23),
+                                                                                );
+
+                                                                                ///Если даты после дня заезда до дня выезда не пусты
+                                                                                if (startEndDiffTimes.isNotEmpty) {
+                                                                                  bookedGuesEntryView = BookedGuesEntryViewEnum.center;
+                                                                                }
+                                                                              } else {
+                                                                                bookedGuesEntryView = BookedGuesEntryViewEnum.date;
+                                                                              }
                                                                             }
-                                                                            reducedAppointmentIndex = appointmentIndex == 0
-                                                                                ? appointmentIndex
-                                                                                : appointmentIndex - 1;
-                                                                            startEndDiffTimes = currentResourceApointments.isEmpty
-                                                                                ? []
-                                                                                : getDateHours(
-                                                                                    startDate!,
-                                                                                    currentResourceApointments[reducedAppointmentIndex].endDate!,
-                                                                                  );
+                                                                          } else {
+                                                                            bookedGuesEntryView =
+                                                                                BookedGuesEntryViewEnum.date;
                                                                           }
                                                                         }
 
-                                                                        isAppointment =
-                                                                            isSameStartVisibleDate == true &&
-                                                                                currentResourceApointments.isNotEmpty;
-
-                                                                        if (isAppointment ==
-                                                                            false) {
+                                                                        if (bookedGuesEntryView ==
+                                                                            BookedGuesEntryViewEnum
+                                                                                .date) {
                                                                           if (isCalendarDayView ==
                                                                               false) {
                                                                             return GestureDetector(
@@ -931,37 +1074,126 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                               ),
                                                                             );
                                                                           }
-                                                                        } else {
-                                                                          if (currentResourceApointments[reducedAppointmentIndex].isSaved ==
-                                                                              true) {
+                                                                        } else if (bookedGuesEntryView ==
+                                                                            BookedGuesEntryViewEnum.end) {
+                                                                          // bookedGuesEntryView =
+                                                                          //     null;
+                                                                          // isAppointmentEnd =
+                                                                          //     null;
+                                                                          // bool
+                                                                          //     isSelectedDayAfter =
+                                                                          // selectedDay.value.add(const Duration(days: 1)).isAfter(selectedDay.value);
+                                                                          // bool isContinue = isCalendarDayView == true
+                                                                          //     ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
+                                                                          //     : (startEndDiffTimes.isNotEmpty ? DateTime(startEndDiffTimes.last.year, startEndDiffTimes.last.month, startEndDiffTimes.last.day).isAfter(selectedDay.value) : false);
+                                                                          // final diffLastTime = startEndDiffTimes.isNotEmpty
+                                                                          //     ? startEndDiffTimes.last
+                                                                          //     : null;
+                                                                          bool isBefore = isCalendarDayView == true
+                                                                              ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
+                                                                              : isEndSelectedDatesSame
+                                                                                  ? true
+                                                                                  : false;
+                                                                          // (startEndDiffTimes.isNotEmpty ? DateTime(diffLastTime!.year, diffLastTime.month, diffLastTime.day).subtract(const Duration(days: 1)).isBefore(selectedDay.value) : false);
+                                                                          double
+                                                                              getAppointmentWidth() {
+                                                                            List<DateTime> _startEndDiff = isCalendarDayView == true
+                                                                                ? startEndDiffDates
+                                                                                : startEndDiffTimes;
+
+                                                                            double
+                                                                                width =
+                                                                                appointmentSize;
+
+                                                                            width = width + (_startEndDiff.isNotEmpty ? (appointmentSize * (_startEndDiff.length - 1)) + (_startEndDiff.length - 1) * 6 : 0)
+                                                                                // -
+                                                                                // (isContinue == true ? (diffDatesAfterLastDate.length * 46) + (diffDatesAfterLastDate.length * 6) : 0)
+                                                                                ;
+                                                                            return width;
+                                                                          }
+
+                                                                          return SizedBox(
+                                                                            width:
+                                                                                getAppointmentWidth(),
+                                                                            child:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                context.pushNamed('guest_info', extra: {
+                                                                                  'info':
+                                                                                      //  currentResourceApointments.isEmpty ? lastAppointment :
+                                                                                      currentResourceApointments[reducedAppointmentIndex].toMap()
+                                                                                });
+                                                                              },
+                                                                              child: AppointmentViewCard(
+                                                                                borderRadius: allCircularRadius12.copyWith(bottomLeft: Radius.circular(isBefore ? 0 : 12), topLeft: Radius.circular(isBefore ? 0 : 12)),
+                                                                                appointment:
+                                                                                    //  currentResourceApointments.isEmpty ? lastAppointment! :
+                                                                                    currentResourceApointments[reducedAppointmentIndex],
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        } else
+                                                                        // if (bookedGuesEntryView == BookedGuesEntryViewEnum.start ||
+                                                                        //     bookedGuesEntryView ==
+                                                                        //         BookedGuesEntryViewEnum.center)
+                                                                        {
+                                                                          if (currentResourceApointments.isNotEmpty &&
+                                                                              currentResourceApointments[reducedAppointmentIndex].isSaved == true) {
                                                                             return const SavedGuestCard();
                                                                           } else {
                                                                             bool
-                                                                                isSelectedDayAfter =
-                                                                                selectedDay.value.add(const Duration(days: 1)).isAfter(selectedDay.value);
-                                                                            bool isContinue = isCalendarDayView == true
-                                                                                ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
-                                                                                : (startEndDiffTimes.isNotEmpty ? isSelectedDayAfter : false);
+                                                                                isBefore =
+                                                                                false;
+                                                                            // isCalendarDayView == true
+                                                                            //   ? (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false)
+                                                                            //   :
+                                                                            if (isCalendarDayView ==
+                                                                                true) {
+                                                                              isBefore = (startEndDiffDates.isNotEmpty ? startEndDiffDates.first.subtract(const Duration(days: 1)).isBefore(_visibleDates.first) : false);
+                                                                            } else {
+                                                                              isBefore = bookedGuesEntryView == BookedGuesEntryViewEnum.center ? true : false;
+                                                                            }
+                                                                            bool
+                                                                                isContinue =
+                                                                                false;
+                                                                            if (isCalendarDayView ==
+                                                                                true) {
+                                                                              isContinue = (startEndDiffDates.isNotEmpty ? startEndDiffDates.last.isAfter(_visibleDates.last) : false);
+                                                                            } else {
+                                                                              if (bookedGuesEntryView == BookedGuesEntryViewEnum.start) {
+                                                                                isContinue = DateTime(startEndDiffTimes.last.year, startEndDiffTimes.last.month, startEndDiffTimes.last.day)
+                                                                                    // .add(const Duration(days: 1))
+                                                                                    .isAfter(selectedDay.value);
+                                                                                // (startEndDiffTimes.isNotEmpty ? startEndDiffTimes.last.isAfter(_visibleDates.last) : false);
+                                                                              } else if (bookedGuesEntryView == BookedGuesEntryViewEnum.center) {
+                                                                                isContinue = true;
+                                                                              }
+                                                                            }
 
+                                                                            // (startEndDiffTimes.isNotEmpty
+                                                                            //     ? isSameDate(diffLastTime, selectedDay.value)
+                                                                            //         ? false
+                                                                            //         : DateTime(diffLastTime!.year, diffLastTime.month, diffLastTime.day).add(const Duration(days: 1)).isAfter(selectedDay.value)
+                                                                            //     : false);
                                                                             double
                                                                                 getAppointmentWidth() {
                                                                               List<DateTime> _startEndDiff = isCalendarDayView == true ? startEndDiffDates : startEndDiffTimes;
-                                                                              int diffDatesAfterLastDate = _startEndDiff.where((e) {
+                                                                              final diffDatesAfterLastDate = _startEndDiff.where((e) {
                                                                                 if (isCalendarDayView == true) {
                                                                                   return e.isAfter(_visibleDates.last);
                                                                                 } else {
-                                                                                  return e.isAfter(selectedDay.value);
+                                                                                  return e.isAfter(selectedDay.value.add(const Duration(hours: 24)));
                                                                                 }
-                                                                              }).length;
+                                                                              });
                                                                               double width = appointmentSize;
 
-                                                                              width = width + (_startEndDiff.isNotEmpty ? (appointmentSize * _startEndDiff.length) + (_startEndDiff.length) * 6 : 0) - (isContinue == true ? (diffDatesAfterLastDate * 46) + (diffDatesAfterLastDate * 6) : 0);
+                                                                              width = width + (_startEndDiff.isNotEmpty ? (appointmentSize * _startEndDiff.length) + (_startEndDiff.length) * 6 : 0) - (isContinue == true ? (diffDatesAfterLastDate.length * 46) + (diffDatesAfterLastDate.length * 6) : 0);
                                                                               return width;
                                                                             }
 
-                                                                            // final _listAppointments = isCalendarDayView == true
-                                                                            //     ? currentResourceApointments
-                                                                            //     : currentResourceApointments;
+                                                                            // bookedGuesEntryView =
+                                                                            //     null;
+
                                                                             return SizedBox(
                                                                               width: getAppointmentWidth(),
                                                                               child: GestureDetector(
@@ -970,8 +1202,8 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                                                                     'info': currentResourceApointments[reducedAppointmentIndex].toMap()
                                                                                   });
                                                                                 },
-                                                                                child: AppointmentViewWidget(
-                                                                                  borderRadius:allCircularRadius12.copyWith(bottomRight: Radius.circular(isContinue ? 0 : 12), topRight: Radius.circular(isContinue ? 0 : 12)),
+                                                                                child: AppointmentViewCard(
+                                                                                  borderRadius: allCircularRadius12.copyWith(bottomLeft: Radius.circular(isBefore ? 0 : 12), topLeft: Radius.circular(isBefore ? 0 : 12), bottomRight: Radius.circular(isContinue ? 0 : 12), topRight: Radius.circular(isContinue ? 0 : 12)),
                                                                                   appointment: currentResourceApointments[reducedAppointmentIndex],
                                                                                 ),
                                                                               ),
@@ -1128,9 +1360,12 @@ class _CalendarViewWidgetState extends State<CalendarViewWidget> {
                                             onDateChanged: (value) {
                                               // startDate.text = DateFormat("dd.MM.y").format(value);
                                               // initStartSelectedDate
-                                              setState(() {
-                                                selectedDay.value = value;
-                                              });
+
+                                              selectedDay.value = value;
+                                              widget.calendarViewEnum.value =
+                                                  CalendarViewEnum.hour;
+                                              setState(() {});
+
                                               // startDate.text = value.toIso8601String();
                                               //  /,
                                             },
