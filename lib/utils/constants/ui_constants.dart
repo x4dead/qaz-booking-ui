@@ -40,7 +40,7 @@ const kPH20V18Dot5 = EdgeInsets.symmetric(horizontal: 20, vertical: 18.5);
 const Radius buttonRadius = Radius.circular(12);
 
 ///Size
-const double appointmentSize = 46;
+const double bookedGuestSize = 46;
 const kS36 = Size(36, 36);
 
 const bottomBorder = Border(

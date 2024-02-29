@@ -84,12 +84,7 @@ class DrawerMenu extends StatelessWidget {
                   childCount: menuButtons.length,
                   (context, index) => SplashButton(
                         onTap: () => switch (index) {
-                          0 => {
-                              goToPage('main')
-
-                              ///
-                              ///TODO: Сделать правильную анимацию перехода в профиль через Drawer меню
-                            },
+                          0 => {goToPage('main')},
                           1 => {goToPage('objects_for_booking')},
                           2 => {goToPage('more_services')},
                           3 => {goToPage('profile')},

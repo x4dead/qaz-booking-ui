@@ -44,12 +44,12 @@ class _ArchivePageState extends State<ArchivePage> {
           SliverPadding(
             padding: kPV15,
             sliver: SliverList.separated(
-              itemCount: listAppointment.length,
+              itemCount: listBookedGuests.length,
               itemBuilder: (ctx, index) {
                 return SplashButton(
                   onTap: () {
                     context.pushNamed('guest_info',
-                        extra: {"info": listAppointment[index].toMap()});
+                        extra: {"info": listBookedGuests[index].toMap()});
                   },
                   child: SizedBox(
                     height: 98,
@@ -65,7 +65,7 @@ class _ArchivePageState extends State<ArchivePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  listAppointment[index].guestFullname ?? '',
+                                  listBookedGuests[index].guestFullname ?? '',
                                   style: AppTextStyle.w500s20.copyWith(
                                       color: AppColors.colorBlack,
                                       height: 24.0.toFigmaHeight(20),

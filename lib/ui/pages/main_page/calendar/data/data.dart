@@ -56,7 +56,7 @@ const listResources = [
   ),
 ];
 final now = DateTime.now();
-final listAppointment = [
+final listBookedGuests = [
   GuestModel(
     startDate: DateTime(2024, 2, 22, 20, 59),
     resourceId: '0006',
@@ -146,14 +146,14 @@ final listAppointment = [
   // //   payment: '6 300 ₸',
   // //   guestFullname: 'Эдуард Б. М.',
   // // ),
-  // GuestModel(
-  //   startDate: DateTime(now.year, now.month, now.day, 0),
-  //   resourceId: '0001',
-  //   endDate: DateTime(now.year, now.month, now.day, 12),
-  //   color: AppColors.colorOrange,
-  //   payment: '77 400 ₸',
-  //   guestFullname: 'Екатерина',
-  // ),
+  GuestModel(
+    startDate: DateTime(now.year, now.month, now.day, 0),
+    resourceId: '0001',
+    endDate: DateTime(now.year, now.month, now.day, 12),
+    color: AppColors.colorOrange,
+    payment: '77 400 ₸',
+    guestFullname: 'Екатерина',
+  ),
   GuestModel(
     isSaved: true,
     startDate: now.subtract(const Duration(days: 2)),

@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:qaz_booking_ui/themes/colors/app_colors.dart';
 import 'package:qaz_booking_ui/ui/pages/main_page/calendar/calendar_view_widget.dart';
+import 'package:qaz_booking_ui/ui/pages/main_page/calendar/common/enums.dart';
 import 'package:qaz_booking_ui/ui/widgets/drawer_menu.dart';
 import 'package:qaz_booking_ui/ui/widgets/custom_app_bar.dart';
-import 'package:qaz_booking_ui/ui/widgets/lib/calendar.dart';
 import 'package:qaz_booking_ui/utils/resources/app_images.dart';
 
 class MoreServicesPage extends StatefulWidget {
@@ -19,7 +19,6 @@ class MoreServicesPage extends StatefulWidget {
 final timeline = ValueNotifier(CalendarViewEnum.hour);
 
 class _MoreServicesPageState extends State<MoreServicesPage> {
-  final calendarController = CalendarController();
   final globalKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
